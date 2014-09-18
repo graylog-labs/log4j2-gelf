@@ -6,37 +6,38 @@ It's using the official [GELF Java client](https://graylog2.github.io/gelfclient
 
 You can specify the following parameters for the GELF appender in the `log4j2.xml` configuration file:
 
-`name` The reference name of the Appender
-
-`server` The host name or IP address of the GELF server (default: `localhost`)
-
-`port` The port the GELF server is listening on (default: `12201`)
-
-`hostName` The host name of the machine generating the logs (default: the local host name or `localhost` if it couldn't be detected)
-
-`protocol` The transport protocol to use (default: `UDP`)
-
-`includeSource` Whether the source of the log message should be included (default: `true`)
-
-`includeThreadContext` Whether the contents of the [ThreadContext](https://logging.apache.org/log4j/2.x/manual/thread-context.html) should be included (default: `true`)
-
-`includeStackTrace` Whether a full stack trace should be included (default: `true`)
-
-`queueSize` The size of the internally used queue (default: `512`)
-
-`connectTimeout` The connection timeout for TCP connections in milliseconds (default: `1000`)
-
-`reconnectDelay` The time to wait between reconnects in milliseconds (default: `500`)
-
-`sendBufferSize` The size of the socket send buffer in bytes. A size of -1 deactivates the send buffer (default: `-1`)
-
-`tcpNoDelay` Whether Nagle's algorithm should be used for TCP connections (default: `false`)
-
-`filter` A [Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to determine if the event should be handled by this Appender
-
-`layout` The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) to use to format the LogEvent (default: `"%m%n"`)
-
-`ignoreExceptions` The default is `true`, causing exceptions encountered while appending events to be internally logged and then ignored. When set to `false` exceptions will be propagated to the caller, instead. Must be set to `false` when wrapping this Appender in a `FailoverAppender`.
+* `name`
+  * The reference name of the Appender
+* `server` (default: `localhost`)
+  * The host name or IP address of the GELF server
+* `port` (default: `12201`)
+  * The port the GELF server is listening on
+* `hostName` (default: the local host name or `localhost` if it couldn't be detected)
+  * The host name of the machine generating the logs
+* `protocol` (default: `UDP`)
+  * The transport protocol to use
+* `includeSource` (default: `true`)
+  * Whether the source of the log message should be included
+* `includeThreadContext` (default: `true`)
+  * Whether the contents of the [ThreadContext](https://logging.apache.org/log4j/2.x/manual/thread-context.html) should be included
+* `includeStackTrace` (default: `true`)
+  * Whether a full stack trace should be included
+* `queueSize` (default: `512`)
+  * The size of the internally used queue
+* `connectTimeout` (default: `1000`)
+  * The connection timeout for TCP connections in milliseconds
+* `reconnectDelay` (default: `500`)
+  * The time to wait between reconnects in milliseconds
+* `sendBufferSize` (default: `-1`)
+  * The size of the socket send buffer in bytes. A size of -1 deactivates the send buffer
+* `tcpNoDelay` (default: `false`)
+  * Whether Nagle's algorithm should be used for TCP connections
+* `filter`
+  * A [Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to determine if the event should be handled by this Appender
+* `layout` (default: `"%m%n"`)
+  * The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) to use to format the LogEvent
+* `ignoreExceptions`
+  * The default is `true`, causing exceptions encountered while appending events to be internally logged and then ignored. When set to `false` exceptions will be propagated to the caller, instead. Must be set to `false` when wrapping this Appender in a `FailoverAppender`.
 
 
 ## Log4j2.xml example
