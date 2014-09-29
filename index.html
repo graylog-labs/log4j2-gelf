@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Log4j2-gelf by Graylog2</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Log4j2-gelf</h1>
+        <h2>GELF Appender for Apache Log4j 2</h2>
+        <a href="https://github.com/Graylog2/log4j2-gelf" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="gelf-appender-for-apache-log4j-2" class="anchor" href="#gelf-appender-for-apache-log4j-2"><span class="octicon octicon-link"></span></a>GELF Appender for Apache Log4j 2</h1>
+
+<p>This appender for <a href="https://logging.apache.org/log4j/2.x/">Apache Log4j 2</a> logs messages to a GELF server like <a href="http://www.graylog2.org">Graylog2</a> or <a href="http://logstash.net">logstash</a>.</p>
+
+<p>It's using the official <a href="https://graylog2.github.io/gelfclient/">GELF Java client</a> to connect to a remote server.</p>
+
+<p>You can specify the following parameters for the GELF appender in the <code>log4j2.xml</code> configuration file:</p>
+
+<ul>
+<li>
+<code>name</code>
+
+<ul>
+<li>The reference name of the Appender</li>
+</ul>
+</li>
+<li>
+<code>server</code> (default: <code>localhost</code>)
+
+<ul>
+<li>The host name or IP address of the GELF server</li>
+</ul>
+</li>
+<li>
+<code>port</code> (default: <code>12201</code>)
+
+<ul>
+<li>The port the GELF server is listening on</li>
+</ul>
+</li>
+<li>
+<code>hostName</code> (default: the local host name or <code>localhost</code> if it couldn't be detected)
+
+<ul>
+<li>The host name of the machine generating the logs</li>
+</ul>
+</li>
+<li>
+<code>protocol</code> (default: <code>UDP</code>)
+
+<ul>
+<li>The transport protocol to use</li>
+</ul>
+</li>
+<li>
+<code>includeSource</code> (default: <code>true</code>)
+
+<ul>
+<li>Whether the source of the log message should be included</li>
+</ul>
+</li>
+<li>
+<code>includeThreadContext</code> (default: <code>true</code>)
+
+<ul>
+<li>Whether the contents of the <a href="https://logging.apache.org/log4j/2.x/manual/thread-context.html">ThreadContext</a> should be included</li>
+</ul>
+</li>
+<li>
+<code>includeStackTrace</code> (default: <code>true</code>)
+
+<ul>
+<li>Whether a full stack trace should be included</li>
+</ul>
+</li>
+<li>
+<code>queueSize</code> (default: <code>512</code>)
+
+<ul>
+<li>The size of the internally used queue</li>
+</ul>
+</li>
+<li>
+<code>connectTimeout</code> (default: <code>1000</code>)
+
+<ul>
+<li>The connection timeout for TCP connections in milliseconds</li>
+</ul>
+</li>
+<li>
+<code>reconnectDelay</code> (default: <code>500</code>)
+
+<ul>
+<li>The time to wait between reconnects in milliseconds</li>
+</ul>
+</li>
+<li>
+<code>sendBufferSize</code> (default: <code>-1</code>)
+
+<ul>
+<li>The size of the socket send buffer in bytes. A size of -1 deactivates the send buffer</li>
+</ul>
+</li>
+<li>
+<code>tcpNoDelay</code> (default: <code>false</code>)
+
+<ul>
+<li>Whether Nagle's algorithm should be used for TCP connections</li>
+</ul>
+</li>
+<li>
+<code>filter</code>
+
+<ul>
+<li>A <a href="https://logging.apache.org/log4j/2.x/manual/filters.html">Filter</a> to determine if the event should be handled by this Appender</li>
+</ul>
+</li>
+<li>
+<code>layout</code> (default: <code>"%m%n"</code>)
+
+<ul>
+<li>The <a href="https://logging.apache.org/log4j/2.x/manual/layouts.html">Layout</a> to use to format the LogEvent</li>
+</ul>
+</li>
+<li>
+<code>ignoreExceptions</code>
+
+<ul>
+<li>The default is <code>true</code>, causing exceptions encountered while appending events to be internally logged and then ignored. When set to <code>false</code> exceptions will be propagated to the caller, instead. Must be set to <code>false</code> when wrapping this Appender in a <code>FailoverAppender</code>.</li>
+</ul>
+</li>
+</ul><h2>
+<a name="log4j2xml-example" class="anchor" href="#log4j2xml-example"><span class="octicon octicon-link"></span></a>Log4j2.xml example</h2>
+
+<pre><code>&lt;configuration status="OFF"&gt;
+    &lt;appenders&gt;
+        &lt;GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com"/&gt;
+    &lt;/appenders&gt;
+    &lt;loggers&gt;
+        &lt;root level="info"&gt;
+            &lt;appender-ref ref="gelfAppender"/&gt;
+        &lt;/root&gt;
+    &lt;/loggers&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<h2>
+<a name="java-code-example" class="anchor" href="#java-code-example"><span class="octicon octicon-link"></span></a>Java code example</h2>
+
+<pre><code>Logger logger = LogManager.getLogger("test");
+ThreadContext.put("userId", "testUser");
+logger.info("Hello World");
+</code></pre>
+
+<h1>
+<a name="versions" class="anchor" href="#versions"><span class="octicon octicon-link"></span></a>Versions</h1>
+
+<table>
+<thead><tr>
+<th>GELF Appender for Apache Log4j 2</th>
+<th>Release date</th>
+</tr></thead>
+<tbody><tr>
+<td>1.0.0</td>
+<td>29-Sep-2014</td>
+</tr></tbody>
+</table><p>This appender uses GELF Java client 1.0.0.</p>
+
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Maven coordinates</p>
+
+<pre><code>&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.graylog2.log4j2&lt;/groupId&gt;
+        &lt;artifactId&gt;log4j2-gelf&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>GELF Appender for Apache Log4j 2</p>
+
+<p>Copyright (C) 2014 TORCH GmbH</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<pre><code>http://www.apache.org/licenses/LICENSE-2.0
+</code></pre>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/Graylog2/log4j2-gelf/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/Graylog2/log4j2-gelf/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/Graylog2/log4j2-gelf"></a> is maintained by <a href="https://github.com/Graylog2">Graylog2</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
