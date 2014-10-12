@@ -89,7 +89,7 @@ public class GelfAppender extends AbstractAppender {
             final StringBuilder stackTraceBuilder = new StringBuilder();
             for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
                 new Formatter(stackTraceBuilder)
-                        .format("%s.%s(%s:%d)\n",
+                        .format("%s.%s(%s:%d)%n",
                                 stackTraceElement.getClassName(), stackTraceElement.getMethodName(),
                                 stackTraceElement.getFileName(), stackTraceElement.getLineNumber());
             }
