@@ -110,6 +110,7 @@ public class GelfAppender extends AbstractAppender {
 
     @Override
     public void start() {
+        super.start();
         client = GelfTransports.create(gelfConfiguration);
     }
 
