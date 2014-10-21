@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+    <Appenders>
+        <GELF name="gelfAppender" server="localhost" port="12201" queueSize="1"/>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="gelfAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
