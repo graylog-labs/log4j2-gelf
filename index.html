@@ -150,7 +150,9 @@
 <li>The default is <code>true</code>, causing exceptions encountered while appending events to be internally logged and then ignored. When set to <code>false</code> exceptions will be propagated to the caller, instead. Must be set to <code>false</code> when wrapping this Appender in a <code>FailoverAppender</code>.</li>
 </ul>
 </li>
-</ul><h2>
+</ul>
+
+<h2>
 <a name="log4j2xml-example" class="anchor" href="#log4j2xml-example"><span class="octicon octicon-link"></span></a>Log4j2.xml example</h2>
 
 <pre><code>&lt;configuration status="OFF"&gt;
@@ -177,15 +179,25 @@ logger.info("Hello World");
 <a name="versions" class="anchor" href="#versions"><span class="octicon octicon-link"></span></a>Versions</h1>
 
 <table>
-<thead><tr>
+<thead>
+<tr>
 <th>GELF Appender for Apache Log4j 2</th>
 <th>Release date</th>
-</tr></thead>
-<tbody><tr>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>1.0.0</td>
 <td>29-Sep-2014</td>
-</tr></tbody>
-</table><p>This appender uses GELF Java client 1.0.0.</p>
+</tr>
+<tr>
+<td>1.0.1</td>
+<td>21-Oct-2014</td>
+</tr>
+</tbody>
+</table>
+
+<p>This appender uses GELF Java client 1.0.0.</p>
 
 <h1>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
@@ -196,7 +208,7 @@ logger.info("Hello World");
     &lt;dependency&gt;
         &lt;groupId&gt;org.graylog2.log4j2&lt;/groupId&gt;
         &lt;artifactId&gt;log4j2-gelf&lt;/artifactId&gt;
-        &lt;version&gt;1.0.0&lt;/version&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
     &lt;/dependency&gt;
 &lt;/dependencies&gt;
 </code></pre>
