@@ -38,13 +38,14 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) to use to format the LogEvent
 * `ignoreExceptions`
   * The default is `true`, causing exceptions encountered while appending events to be internally logged and then ignored. When set to `false` exceptions will be propagated to the caller, instead. Must be set to `false` when wrapping this Appender in a `FailoverAppender`.
-
+* `additionalFields`
+  * Comma delimited list of name value pairs to be included on every message
 
 ## Log4j2.xml example
 
     <configuration status="OFF">
         <appenders>
-            <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com"/>
+            <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com" additionalFields="foo=bar"/>
         </appenders>
         <loggers>
             <root level="info">
@@ -74,7 +75,7 @@ This appender uses GELF Java client 1.0.0.
 # Installation
 
 Maven coordinates
-    
+
     <dependencies>
         <dependency>
             <groupId>org.graylog2.log4j2</groupId>
