@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="info" packages="org.graylog2.log4j2">
     <Appenders>
-        <GELF name="gelfAppender" server="10.169.40.68" port="12201" queueSize="1"/>
+        <GELF name="gelfAppender" server="localhost" port="12201" queueSize="1"/>
         
-        <GELF name="gelfAppenderAF" server="10.169.40.68" port="12201" queueSize="1" additionalFields="app=test2,foo=bar2"/>
+        <GELF name="gelfAppenderAF" server="localhost" port="12201" queueSize="1" additionalFields="app=test2,foo=bar2"/>
         
         <Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] [%c{1.}] - %m%n" />
