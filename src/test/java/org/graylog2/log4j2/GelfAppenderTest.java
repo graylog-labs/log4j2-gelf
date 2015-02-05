@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 public class GelfAppenderTest {
@@ -46,6 +47,11 @@ public class GelfAppenderTest {
         logger.info("Hello World");
 
         ThreadContext.clearAll();
+    }
 
+    @AfterClass
+    public static void shutdown() throws InterruptedException {
+        //need to wait to hope the underlying gelf client pushes the messages.
+        Thread.sleep(500);
     }
 }
