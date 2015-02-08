@@ -1,4 +1,15 @@
+
 package org.graylog2.log4j2;
+
+
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -20,16 +31,11 @@ import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.GelfTransports;
 import org.graylog2.gelfclient.transport.GelfTransport;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.Formatter;
-import java.util.List;
-import java.util.Map;
 
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
+    private static final long serialVersionUID = 4796033328540158817L;
+
     private static final Logger LOG = StatusLogger.getLogger();
 
     private final GelfConfiguration gelfConfiguration;
@@ -38,25 +44,51 @@ public class GelfAppender extends AbstractAppender {
     private final boolean includeThreadContext;
     private final boolean includeStackTrace;
 
+    /**
+     * Additional custom fields that will be added to every log message.
+     */
+    protected Map<String, Object> additionalFields;
+
     private GelfTransport client;
 
-    protected GelfAppender(final String name, final Layout<? extends Serializable> layout, final Filter filter,
-                           final boolean ignoreExceptions, final GelfConfiguration gelfConfiguration, final String hostName,
-                           final boolean includeSource, final boolean includeThreadContext, final boolean includeStackTrace) {
+
+    protected GelfAppender(final String name,
+                           final Layout<? extends Serializable> layout,
+                           final Filter filter,
+                           final boolean ignoreExceptions,
+                           final GelfConfiguration gelfConfiguration,
+                           final String hostName,
+                           final boolean includeSource,
+                           final boolean includeThreadContext,
+                           final boolean includeStackTrace,
+                           String additionalFields) {
         super(name, filter, layout, ignoreExceptions);
         this.gelfConfiguration = gelfConfiguration;
         this.hostName = hostName;
         this.includeSource = includeSource;
         this.includeThreadContext = includeThreadContext;
         this.includeStackTrace = includeStackTrace;
+
+        if (null != additionalFields && additionalFields.length() > 0) {
+            this.additionalFields = new HashMap<String, Object>();
+
+            try {
+                String[] values = additionalFields.split(",");
+                for (String s : values) {
+                    String[] nvp = s.split("=");
+                    this.additionalFields.put(nvp[0], nvp[1]);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Failed to read additional fields: ", e);
+            }
+        }
     }
+
 
     @Override
     public void append(LogEvent event) {
-        final GelfMessageBuilder builder = new GelfMessageBuilder(event.getMessage().getFormattedMessage(), hostName)
-                .timestamp(event.getTimeMillis() / 1000d)
-                .level(GelfMessageLevel.fromNumericLevel(Severity.getSeverity(event.getLevel()).getCode()))
-                .additionalField("loggerName", event.getLoggerName())
+        final GelfMessageBuilder builder = new GelfMessageBuilder(event.getMessage().getFormattedMessage(), hostName).timestamp(event.getTimeMillis() / 1000d)
+                .level(GelfMessageLevel.fromNumericLevel(Severity.getSeverity(event.getLevel()).getCode())).additionalField("loggerName", event.getLoggerName())
                 .additionalField("threadName", event.getThreadName());
 
         final Marker marker = event.getMarker();
@@ -88,18 +120,23 @@ public class GelfAppender extends AbstractAppender {
         if (includeStackTrace && thrown != null) {
             final StringBuilder stackTraceBuilder = new StringBuilder();
             for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
-                new Formatter(stackTraceBuilder)
-                        .format("%s.%s(%s:%d)%n",
-                                stackTraceElement.getClassName(), stackTraceElement.getMethodName(),
-                                stackTraceElement.getFileName(), stackTraceElement.getLineNumber());
+                new Formatter(stackTraceBuilder).format("%s.%s(%s:%d)%n",
+                        stackTraceElement.getClassName(),
+                        stackTraceElement.getMethodName(),
+                        stackTraceElement.getFileName(),
+                        stackTraceElement.getLineNumber());
             }
 
             builder.additionalField("exceptionClass", thrown.getClass().getCanonicalName());
             builder.additionalField("exceptionMessage", thrown.getMessage());
             builder.additionalField("exceptionStackTrace", stackTraceBuilder.toString());
+
+            if (this.additionalFields != null) {
+                builder.additionalFields(additionalFields);
+            }
+
             builder.fullMessage(event.getMessage().getFormattedMessage() + "\n\n" + stackTraceBuilder.toString());
         }
-
 
         try {
             client.send(builder.build());
@@ -108,11 +145,13 @@ public class GelfAppender extends AbstractAppender {
         }
     }
 
+
     @Override
     public void start() {
         super.start();
         client = GelfTransports.create(gelfConfiguration);
     }
+
 
     @Override
     public void stop() {
@@ -120,21 +159,15 @@ public class GelfAppender extends AbstractAppender {
         client.stop();
     }
 
+
     @Override
     public String toString() {
-        return GelfAppender.class.getSimpleName() + "{"
-                + "name=" + getName()
-                + ",server=" + gelfConfiguration.getRemoteAddress().getHostName()
-                + ",port=" + gelfConfiguration.getRemoteAddress().getPort()
-                + ",protocol=" + gelfConfiguration.getTransport().toString()
-                + ",hostName=" + hostName
-                + ",queueSize=" + gelfConfiguration.getQueueSize()
-                + ",connectTimeout=" + gelfConfiguration.getConnectTimeout()
-                + ",reconnectDelay=" + gelfConfiguration.getReconnectDelay()
-                + ",sendBufferSize=" + gelfConfiguration.getSendBufferSize()
-                + ",tcpNoDelay=" + gelfConfiguration.isTcpNoDelay()
-                + "}";
+        return GelfAppender.class.getSimpleName() + "{" + "name=" + getName() + ",server=" + gelfConfiguration.getRemoteAddress().getHostName() + ",port="
+                + gelfConfiguration.getRemoteAddress().getPort() + ",protocol=" + gelfConfiguration.getTransport().toString() + ",hostName=" + hostName + ",queueSize=" + gelfConfiguration.getQueueSize()
+                + ",connectTimeout=" + gelfConfiguration.getConnectTimeout() + ",reconnectDelay=" + gelfConfiguration.getReconnectDelay() + ",sendBufferSize=" + gelfConfiguration.getSendBufferSize()
+                + ",tcpNoDelay=" + gelfConfiguration.isTcpNoDelay() + "}";
     }
+
 
     /**
      * Factory method for creating a {@link GelfTransport} provider within the plugin manager.
@@ -159,27 +192,27 @@ public class GelfAppender extends AbstractAppender {
      * @param includeSource        Whether the source of the log message should be included, defaults to {@code true}.
      * @param includeThreadContext Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
      * @param includeStackTrace    Whether a full stack trace should be included, defaults to {@code true}.
+     * @param additionalFields     Additional custom fields that will be added to every log message. comma delimited, name value pairs
      * @return a new GELF provider
      */
     @PluginFactory
-    public static GelfAppender createGelfAppender(
-            @PluginElement("Filter") Filter filter,
-            @PluginElement("Layout") Layout<? extends Serializable> layout,
-            @PluginAttribute(value = "name") String name,
-            @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) Boolean ignoreExceptions,
-            @PluginAttribute(value = "server", defaultString = "localhost") String server,
-            @PluginAttribute(value = "port", defaultInt = 12201) Integer port,
-            @PluginAttribute(value = "protocol", defaultString = "UDP") String protocol,
-            @PluginAttribute(value = "hostName") String hostName,
-            @PluginAttribute(value = "queueSize", defaultInt = 512) Integer queueSize,
-            @PluginAttribute(value = "connectTimeout", defaultInt = 1000) Integer connectTimeout,
-            @PluginAttribute(value = "reconnectDelay", defaultInt = 500) Integer reconnectDelay,
-            @PluginAttribute(value = "sendBufferSize", defaultInt = -1) Integer sendBufferSize,
-            @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false) Boolean tcpNoDelay,
-            @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
-            @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
-            @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace
-    ) {
+    public static GelfAppender createGelfAppender(@PluginElement("Filter") Filter filter,
+                                                  @PluginElement("Layout") Layout<? extends Serializable> layout,
+                                                  @PluginAttribute(value = "name") String name,
+                                                  @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) Boolean ignoreExceptions,
+                                                  @PluginAttribute(value = "server", defaultString = "localhost") String server,
+                                                  @PluginAttribute(value = "port", defaultInt = 12201) Integer port,
+                                                  @PluginAttribute(value = "protocol", defaultString = "UDP") String protocol,
+                                                  @PluginAttribute(value = "hostName") String hostName,
+                                                  @PluginAttribute(value = "queueSize", defaultInt = 512) Integer queueSize,
+                                                  @PluginAttribute(value = "connectTimeout", defaultInt = 1000) Integer connectTimeout,
+                                                  @PluginAttribute(value = "reconnectDelay", defaultInt = 500) Integer reconnectDelay,
+                                                  @PluginAttribute(value = "sendBufferSize", defaultInt = -1) Integer sendBufferSize,
+                                                  @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false) Boolean tcpNoDelay,
+                                                  @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
+                                                  @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
+                                                  @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
+                                                  @PluginAttribute(value = "additionalFields") String additionalFields) {
         if (name == null) {
             LOGGER.error("No name provided for ConsoleAppender");
             return null;
@@ -202,15 +235,9 @@ public class GelfAppender extends AbstractAppender {
 
         final InetSocketAddress serverAddress = new InetSocketAddress(server, port);
         final GelfTransports gelfProtocol = GelfTransports.valueOf(protocol.toUpperCase());
-        final GelfConfiguration gelfConfiguration = new GelfConfiguration(serverAddress)
-                .transport(gelfProtocol)
-                .queueSize(queueSize)
-                .connectTimeout(connectTimeout)
-                .reconnectDelay(reconnectDelay)
-                .sendBufferSize(sendBufferSize)
-                .tcpNoDelay(tcpNoDelay);
+        final GelfConfiguration gelfConfiguration = new GelfConfiguration(serverAddress).transport(gelfProtocol).queueSize(queueSize).connectTimeout(connectTimeout)
+                .reconnectDelay(reconnectDelay).sendBufferSize(sendBufferSize).tcpNoDelay(tcpNoDelay);
 
-        return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName,
-                includeSource, includeThreadContext, includeStackTrace);
+        return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource, includeThreadContext, includeStackTrace, additionalFields);
     }
 }

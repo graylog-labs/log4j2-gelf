@@ -1,11 +1,15 @@
+
 package org.graylog2.log4j2;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
+import org.junit.AfterClass;
 import org.junit.Test;
+
 
 public class GelfAppenderTest {
     @Test
@@ -14,6 +18,7 @@ public class GelfAppenderTest {
         logger.info("Hello World");
     }
 
+
     @Test
     public void testMarker() {
         final Logger logger = LogManager.getLogger("test");
@@ -21,6 +26,7 @@ public class GelfAppenderTest {
         final Marker marker = MarkerManager.getMarker("TEST").addParents(parent);
         logger.info(marker, "Hello World");
     }
+
 
     @Test
     public void testException() {
@@ -33,6 +39,7 @@ public class GelfAppenderTest {
             logger.error("Hello World", e);
         }
     }
+
 
     @Test
     public void testThreadContext() {
@@ -47,5 +54,12 @@ public class GelfAppenderTest {
 
         ThreadContext.clearAll();
 
+    }
+
+
+    @AfterClass
+    public static void shutdown() throws InterruptedException {
+        //need to wait to hope the underlying gelf client pushes the messages.
+        Thread.sleep(500);
     }
 }
