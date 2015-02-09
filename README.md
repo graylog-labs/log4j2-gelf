@@ -69,6 +69,7 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
 | -------------------------------- | ------------ |
 | 1.0.0                            | 29-Sep-2014  |
 | 1.0.1                            | 21-Oct-2014  |
+| 1.0.2                            | 09-Feb-2015  |
 
 This appender uses GELF Java client 1.0.0.
 
@@ -81,7 +82,7 @@ Maven coordinates
         <dependency>
             <groupId>org.graylog2.log4j2</groupId>
             <artifactId>log4j2-gelf</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 
