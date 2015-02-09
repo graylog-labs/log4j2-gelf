@@ -13,7 +13,7 @@
 
     <groupId>org.graylog2.log4j2</groupId>
     <artifactId>log4j2-gelf</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <name>log4j2-gelf</name>
     <description>GELF Appender for Log4j2</description>
@@ -31,7 +31,7 @@
         <connection>scm:git:git@github.com:Graylog2/log4j2-gelf.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/log4j2-gelf.git</developerConnection>
         <url>https://github.com/Graylog2/log4j2-gelf</url>
-      <tag>log4j2-gelf-1.0.2</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
