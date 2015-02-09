@@ -1,4 +1,5 @@
 # GELF Appender for Apache Log4j 2
+[![Build Status](https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master)](https://travis-ci.org/Graylog2/log4j2-gelf)
 
 This appender for [Apache Log4j 2](https://logging.apache.org/log4j/2.x/) logs messages to a GELF server like [Graylog2](http://www.graylog2.org) or [logstash](http://logstash.net).
 
