@@ -44,8 +44,8 @@
     </ciManagement>
 
     <organization>
-        <name>TORCH</name>
-        <url>http://www.torch.sh/</url>
+        <name>Graylog, Inc.</name>
+        <url>https://www.graylog.com/</url>
     </organization>
 
     <properties>
