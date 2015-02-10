@@ -126,9 +126,12 @@ public class GelfAppender extends AbstractAppender {
             builder.additionalField("exceptionClass", thrown.getClass().getCanonicalName());
             builder.additionalField("exceptionMessage", thrown.getMessage());
             builder.additionalField("exceptionStackTrace", stackTraceBuilder.toString());
-            builder.additionalFields(additionalFields);
 
             builder.fullMessage(event.getMessage().getFormattedMessage() + "\n\n" + stackTraceBuilder.toString());
+        }
+        
+        if (!additionalFields.isEmpty()) {
+        	builder.additionalFields(additionalFields);
         }
 
         try {
