@@ -1,5 +1,10 @@
 # log4j-gelf Changelog
 
+## 1.0.3
+
+* Additional static fields were only included if message contained an exception
+
+
 ## 1.0.2
 
 * Add setting for additional static fields to configuration
