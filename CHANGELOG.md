@@ -1,5 +1,11 @@
 # log4j-gelf Changelog
 
+## 1.1.0
+
+* Add support for TCP keepalive
+* Upgrade to gelfclient 1.3.0
+
+
 ## 1.0.3
 
 * Additional static fields were only included if message contained an exception

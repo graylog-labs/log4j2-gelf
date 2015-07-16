@@ -166,6 +166,7 @@ public class GelfAppender extends AbstractAppender {
                 + ",reconnectDelay=" + gelfConfiguration.getReconnectDelay()
                 + ",sendBufferSize=" + gelfConfiguration.getSendBufferSize()
                 + ",tcpNoDelay=" + gelfConfiguration.isTcpNoDelay()
+                + ",tcpKeepAlive=" + gelfConfiguration.isTcpKeepAlive()
                 + "}";
     }
 
@@ -189,6 +190,7 @@ public class GelfAppender extends AbstractAppender {
      * @param reconnectDelay       The time to wait between reconnects in milliseconds, defaults to {@code 500}.
      * @param sendBufferSize       The size of the socket send buffer in bytes, defaults to {@code -1} (deactivate).
      * @param tcpNoDelay           Whether Nagle's algorithm should be used for TCP connections, defaults to {@code false}.
+     * @param tcpKeepAlive         Whether to try keeping alive TCP connections, defaults to {@code false}.
      * @param includeSource        Whether the source of the log message should be included, defaults to {@code true}.
      * @param includeThreadContext Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
      * @param includeStackTrace    Whether a full stack trace should be included, defaults to {@code true}.
@@ -209,6 +211,7 @@ public class GelfAppender extends AbstractAppender {
                                                   @PluginAttribute(value = "reconnectDelay", defaultInt = 500) Integer reconnectDelay,
                                                   @PluginAttribute(value = "sendBufferSize", defaultInt = -1) Integer sendBufferSize,
                                                   @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false) Boolean tcpNoDelay,
+                                                  @PluginAttribute(value = "tcpKeepAlive", defaultBoolean = false) Boolean tcpKeepAlive,
                                                   @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
                                                   @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
                                                   @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
@@ -241,7 +244,8 @@ public class GelfAppender extends AbstractAppender {
                 .connectTimeout(connectTimeout)
                 .reconnectDelay(reconnectDelay)
                 .sendBufferSize(sendBufferSize)
-                .tcpNoDelay(tcpNoDelay);
+                .tcpNoDelay(tcpNoDelay)
+                .tcpKeepAlive(tcpKeepAlive);
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
                 includeThreadContext, includeStackTrace, additionalFields);

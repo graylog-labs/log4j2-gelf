@@ -33,6 +33,8 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * The size of the socket send buffer in bytes. A size of -1 deactivates the send buffer
 * `tcpNoDelay` (default: `false`)
   * Whether Nagle's algorithm should be used for TCP connections
+* `tcpKeepAlive` (default: `false`)
+  * Whether to try keeping alive TCP connections.
 * `filter`
   * A [Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to determine if the event should be handled by this Appender
 * `layout` (default: `"%m%n"`)
