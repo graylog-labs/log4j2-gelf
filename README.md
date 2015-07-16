@@ -86,7 +86,7 @@ Maven coordinates
         <dependency>
             <groupId>org.graylog2.log4j2</groupId>
             <artifactId>log4j2-gelf</artifactId>
-            <version>1.0.3</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
@@ -95,7 +95,7 @@ Maven coordinates
 
 GELF Appender for Apache Log4j 2
 
-Copyright (C) 2014 TORCH GmbH
+Copyright (C) 2014 TORCH GmbH; 2015 Graylog, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
