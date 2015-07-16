@@ -73,7 +73,7 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
 | 1.0.1                            | 21-Oct-2014  |
 | 1.0.2                            | 09-Feb-2015  |
 | 1.0.3                            | 11-Feb-2015  |
-| 1.1.0                            | XX-XXX-2015  |
+| 1.1.0                            | 16-Jul-2015  |
 
 This appender uses GELF Java client 1.3.0.
 

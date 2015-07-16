@@ -4,6 +4,7 @@
 
 * Add support for TCP keepalive
 * Upgrade to gelfclient 1.3.0
+* Provide a shaded JAR containing all dependencies
 
 
 ## 1.0.3
