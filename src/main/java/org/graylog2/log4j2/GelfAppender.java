@@ -211,6 +211,7 @@ public class GelfAppender extends AbstractAppender {
                                                   @PluginAttribute(value = "reconnectDelay", defaultInt = 500) Integer reconnectDelay,
                                                   @PluginAttribute(value = "sendBufferSize", defaultInt = -1) Integer sendBufferSize,
                                                   @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false) Boolean tcpNoDelay,
+                                                  @PluginAttribute(value = "tcpUseTls", defaultBoolean = false) Boolean tcpUseTls,
                                                   @PluginAttribute(value = "tcpKeepAlive", defaultBoolean = false) Boolean tcpKeepAlive,
                                                   @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
                                                   @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
@@ -246,6 +247,10 @@ public class GelfAppender extends AbstractAppender {
                 .sendBufferSize(sendBufferSize)
                 .tcpNoDelay(tcpNoDelay)
                 .tcpKeepAlive(tcpKeepAlive);
+
+        if(tcpUseTls) {
+            gelfConfiguration.enableTls();
+        }
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
                 includeThreadContext, includeStackTrace, additionalFields);
