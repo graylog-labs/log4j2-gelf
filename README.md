@@ -67,31 +67,33 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
 ## Using variables in the additionalFields
 
 The `additionalFields` attribute can contain references to variables. 
-In order for Log4J 2.x to resolve the variable's value, the variable name must have a certain prefix depending on how the variable is provided.
-Internally we're making use of Log4J's [StrSubstitutor](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StrSubstitutor.html) to resolve the variable's value. 
+In order for Log4j 2.x to resolve the variable's value, the variable name must have a certain prefix depending on how the variable is provided.
+Internally we're making use of Log4j's [StrSubstitutor](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StrSubstitutor.html) to resolve the variable's value. 
 This in turn is utilizing the following [Log4j Lookups](https://logging.apache.org/log4j/2.x/manual/lookups.html) with the prefixes in the following list:
 
-- "date" -> [DateLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html)
-- "sd" -> [StructuredDataLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html)
-- "java" -> [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)
-- "ctx" -> [ContextMapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ContextMapLookup.html)
-- "jndi" -> [JndiLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JndiLookup.html)
-- "jvmrunargs" -> [JmxRuntimeInputArgumentsLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup.html)
-- "env" -> [EnvironmentLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/EnvironmentLookup.html)
-- "sys" -> [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)
-- "map" -> [MapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/MapLookup.html)
-- "bundle" -> [ResourceBundleLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ResourceBundleLookup.html)
+| Prefix       | Documentation                                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`       | [DateLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html)                                         |
+| `sd`         | [StructuredDataLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html)                     |
+| `java`       | [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)                 |
+| `ctx`        | [ContextMapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ContextMapLookup.html)                             |
+| `jndi`       | [JndiLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JndiLookup.html)                                         |
+| `jvmrunargs` | [JmxRuntimeInputArgumentsLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup.html) |
+| `env`        | [EnvironmentLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/EnvironmentLookup.html)                           |
+| `sys`        | [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)                 |
+| `map`        | [MapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/MapLookup.html)                                           |
+| `bundle`     | [ResourceBundleLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ResourceBundleLookup.html)                     |
 
-Please read up on the different variable handling in the linked javadocs.
+Please read up on the different variable handling in the linked Javadocs.
 
 ### Example configuration with variables
-```
-<GELF name="gelfAppender" 
-  server="graylog2.example.com" 
-  port="12201" 
-  hostName="appserver01.example.com" 
-  additionalFields="user=${env:USER},CLIargument=${sys:cliargument},jvm=${java:vm},fileEncoding=${sys:file.encoding}""/>
-```
+
+    <GELF name="gelfAppender" 
+      server="graylog2.example.com" 
+      port="12201" 
+      hostName="appserver01.example.com" 
+      additionalFields="user=${env:USER},CLIargument=${sys:cliargument},jvm=${java:vm},fileEncoding=${sys:file.encoding}""/>
+
 
 # Versions
 
