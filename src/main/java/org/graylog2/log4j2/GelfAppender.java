@@ -135,7 +135,17 @@ public class GelfAppender extends AbstractAppender {
         }
 
         try {
-            client.send(builder.build());
+          client.send(builder.build());
+        } catch (InterruptedException e){
+          try {
+            boolean sentMessage = client.trySend(builder.build());
+            if (!sentMessage) {
+              throw new AppenderLoggingException("interrupted while attempting to write a log message", e);
+            }
+          } finally {
+            Thread.currentThread().interrupt();
+          }
+
         } catch (Exception e) {
             throw new AppenderLoggingException("failed to write log event to GELF server: " + e.getMessage(), e);
         }
