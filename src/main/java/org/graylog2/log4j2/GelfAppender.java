@@ -20,6 +20,7 @@ import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.GelfTransports;
 import org.graylog2.gelfclient.transport.GelfTransport;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -167,34 +168,42 @@ public class GelfAppender extends AbstractAppender {
                 + ",sendBufferSize=" + gelfConfiguration.getSendBufferSize()
                 + ",tcpNoDelay=" + gelfConfiguration.isTcpNoDelay()
                 + ",tcpKeepAlive=" + gelfConfiguration.isTcpKeepAlive()
+                + ",tlsEnabled=" + gelfConfiguration.isTlsEnabled()
+                + ",tlsCertVerificationEnabled=" + gelfConfiguration.isTlsCertVerificationEnabled()
+                + ",tlsTrustCertChainFilename=" + (gelfConfiguration.getTlsTrustCertChainFile() != null ?
+                        gelfConfiguration.getTlsTrustCertChainFile().getPath() : "null")
                 + "}";
     }
 
     /**
      * Factory method for creating a {@link GelfTransport} provider within the plugin manager.
      *
-     * @param name                 The name of the Appender.
-     * @param filter               A Filter to determine if the event should be handled by this Appender.
-     * @param layout               The Layout to use to format the LogEvent defaults to {@code "%m%n"}.
-     * @param ignoreExceptions     The default is {@code true}, causing exceptions encountered while appending events
-     *                             to be internally logged and then ignored. When set to {@code false} exceptions will
-     *                             be propagated to the caller, instead. Must be set to {@code false} when wrapping this
-     *                             Appender in a {@link org.apache.logging.log4j.core.appender.FailoverAppender}.
-     * @param server               The server name of the GELF server, defaults to {@code localhost}.
-     * @param port                 The port the GELF server is listening on, defaults to {@code 12201}.
-     * @param hostName             The host name of the machine generating the logs, defaults to local host name
-     *                             or {@code localhost} if it couldn't be detected.
-     * @param protocol             The transport protocol to use, defaults to {@code UDP}.
-     * @param queueSize            The size of the internally used queue, defaults to {@code 512}.
-     * @param connectTimeout       The connection timeout for TCP connections in milliseconds, defaults to {@code 1000}.
-     * @param reconnectDelay       The time to wait between reconnects in milliseconds, defaults to {@code 500}.
-     * @param sendBufferSize       The size of the socket send buffer in bytes, defaults to {@code -1} (deactivate).
-     * @param tcpNoDelay           Whether Nagle's algorithm should be used for TCP connections, defaults to {@code false}.
-     * @param tcpKeepAlive         Whether to try keeping alive TCP connections, defaults to {@code false}.
-     * @param includeSource        Whether the source of the log message should be included, defaults to {@code true}.
-     * @param includeThreadContext Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
-     * @param includeStackTrace    Whether a full stack trace should be included, defaults to {@code true}.
-     * @param additionalFields     Additional static comma-delimited key=value pairs that will be added to every log message.
+     * @param name                        The name of the Appender.
+     * @param filter                      A Filter to determine if the event should be handled by this Appender.
+     * @param layout                      The Layout to use to format the LogEvent defaults to {@code "%m%n"}.
+     * @param ignoreExceptions            The default is {@code true}, causing exceptions encountered while appending events
+     *                                    to be internally logged and then ignored. When set to {@code false} exceptions will
+     *                                    be propagated to the caller, instead. Must be set to {@code false} when wrapping this
+     *                                    Appender in a {@link org.apache.logging.log4j.core.appender.FailoverAppender}.
+     * @param server                      The server name of the GELF server, defaults to {@code localhost}.
+     * @param port                        The port the GELF server is listening on, defaults to {@code 12201}.
+     * @param hostName                    The host name of the machine generating the logs, defaults to local host name
+     *                                    or {@code localhost} if it couldn't be detected.
+     * @param protocol                    The transport protocol to use, defaults to {@code UDP}.
+     * @param tlsEnabled                  Whether TLS should be enabled, defaults to {@code false}.
+     * @param tlsCertVerificationEnabled  Whether TLS cerificate chain should be checked, defaults to {@code true}.
+     * @param tlsTrustCertChainFilename   A X.509 certificate chain file in PEM format for certificate verification, defaults to {@code null}
+     * @param queueSize                   The size of the internally used queue, defaults to {@code 512}.
+     * @param connectTimeout              The connection timeout for TCP connections in milliseconds, defaults to {@code 1000}.
+     * @param reconnectDelay              The time to wait between reconnects in milliseconds, defaults to {@code 500}.
+     * @param sendBufferSize              The size of the socket send buffer in bytes, defaults to {@code -1} (deactivate).
+     * @param tcpNoDelay                  Whether Nagle's algorithm should be used for TCP connections, defaults to {@code false}.
+     * @param tcpKeepAlive                Whether to try keeping alive TCP connections, defaults to {@code false}.
+     * @param includeSource               Whether the source of the log message should be included, defaults to {@code true}.
+     * @param includeThreadContext        Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
+     * @param includeStackTrace           Whether a full stack trace should be included, defaults to {@code true}.
+     * @param additionalFields            Additional static comma-delimited key=value pairs that will be added to every log message.
+     *        
      * @return a new GELF provider
      */
     @PluginFactory
@@ -215,7 +224,10 @@ public class GelfAppender extends AbstractAppender {
                                                   @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
                                                   @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
                                                   @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
-                                                  @PluginAttribute(value = "additionalFields") String additionalFields) {
+                                                  @PluginAttribute(value = "additionalFields") String additionalFields,
+                                                  @PluginAttribute(value = "tlsEnabled", defaultBoolean = false) Boolean tlsEnabled,
+                                                  @PluginAttribute(value = "tlsCertVerificationEnabled", defaultBoolean = true) Boolean tlsCertVerificationEnabled,
+                                                  @PluginAttribute(value = "tlsTrustCertChainFilename") String tlsTrustCertChainFilename) {
         if (name == null) {
             LOGGER.error("No name provided for ConsoleAppender");
             return null;
@@ -247,6 +259,21 @@ public class GelfAppender extends AbstractAppender {
                 .tcpNoDelay(tcpNoDelay)
                 .tcpKeepAlive(tcpKeepAlive);
 
+        if (tlsEnabled) {
+            if(gelfProtocol.equals(GelfTransports.TCP)) {
+                gelfConfiguration.enableTls();
+                if(!tlsCertVerificationEnabled) {
+                    LOG.warn("TLS certificate validation is disabled. This is unsecure!");
+                    gelfConfiguration.disableTlsCertVerification();
+                }
+                if(tlsCertVerificationEnabled && tlsTrustCertChainFilename != null) {
+                    gelfConfiguration.tlsTrustCertChainFile(new File(tlsTrustCertChainFilename));
+                }
+            } else {
+                LOG.warn("Enabling of TLS is invalid for UDP Transport");
+            }
+        }
+        
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
                 includeThreadContext, includeStackTrace, additionalFields);
     }
