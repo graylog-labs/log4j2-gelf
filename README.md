@@ -92,7 +92,7 @@ Please read up on the different variable handling in the linked Javadocs.
       server="graylog2.example.com" 
       port="12201" 
       hostName="appserver01.example.com" 
-      additionalFields="user=${env:USER},CLIargument=${sys:cliargument},jvm=${java:vm},fileEncoding=${sys:file.encoding}""/>
+      additionalFields="user=${env:USER},CLIargument=${sys:cliargument},jvm=${java:vm},fileEncoding=${sys:file.encoding}"/>
 
 
 # Versions
