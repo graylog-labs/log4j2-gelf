@@ -1,5 +1,17 @@
 package org.graylog2.log4j2;
 
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Filter;
@@ -20,30 +32,25 @@ import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.GelfTransports;
 import org.graylog2.gelfclient.transport.GelfTransport;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
+
     private static final long serialVersionUID = 4796033328540158817L;
 
     private static final Logger LOG = StatusLogger.getLogger();
+    protected static final String ADD_FIELD_EXCEPTION_STACK_TRACE = "exceptionStackTrace";
+    public static final String ADD_FIELD_EXCEPTION_MESSAGE = "exceptionMessage";
+    public static final String ADD_FIELD_EXCEPTION_CLASS = "exceptionClass";
 
     private final GelfConfiguration gelfConfiguration;
     private final String hostName;
     private final boolean includeSource;
     private final boolean includeThreadContext;
     private final boolean includeStackTrace;
+    private final Boolean includeExceptionCause;
     private final Map<String, Object> additionalFields;
 
-    private GelfTransport client;
+    protected GelfTransport client;
 
     protected GelfAppender(final String name,
                            final Layout<? extends Serializable> layout,
@@ -54,13 +61,15 @@ public class GelfAppender extends AbstractAppender {
                            final boolean includeSource,
                            final boolean includeThreadContext,
                            final boolean includeStackTrace,
-                           String additionalFields) {
+                           String additionalFields,
+                           final Boolean includeExceptionCause) {
         super(name, filter, layout, ignoreExceptions);
         this.gelfConfiguration = gelfConfiguration;
         this.hostName = hostName;
         this.includeSource = includeSource;
         this.includeThreadContext = includeThreadContext;
         this.includeStackTrace = includeStackTrace;
+        this.includeExceptionCause = includeExceptionCause;
 
         if (null != additionalFields && !additionalFields.isEmpty()) {
             this.additionalFields = new HashMap<>();
@@ -114,24 +123,24 @@ public class GelfAppender extends AbstractAppender {
         @SuppressWarnings("all")
         final Throwable thrown = event.getThrown();
         if (includeStackTrace && thrown != null) {
-            final StringBuilder stackTraceBuilder = new StringBuilder();
-            for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
-                new Formatter(stackTraceBuilder).format("%s.%s(%s:%d)%n",
-                        stackTraceElement.getClassName(),
-                        stackTraceElement.getMethodName(),
-                        stackTraceElement.getFileName(),
-                        stackTraceElement.getLineNumber());
+            String stackTrace;
+            if (includeExceptionCause) {
+                StringWriter stringWriter = new StringWriter();
+                thrown.printStackTrace(new PrintWriter(stringWriter));
+                stackTrace = stringWriter.toString();
+            } else {
+                stackTrace = getSimpleStacktraceAsString(thrown);
             }
 
-            builder.additionalField("exceptionClass", thrown.getClass().getCanonicalName());
-            builder.additionalField("exceptionMessage", thrown.getMessage());
-            builder.additionalField("exceptionStackTrace", stackTraceBuilder.toString());
+            builder.additionalField(ADD_FIELD_EXCEPTION_CLASS, thrown.getClass().getCanonicalName());
+            builder.additionalField(ADD_FIELD_EXCEPTION_MESSAGE, thrown.getMessage());
+            builder.additionalField(ADD_FIELD_EXCEPTION_STACK_TRACE, stackTrace);
 
-            builder.fullMessage(event.getMessage().getFormattedMessage() + "\n\n" + stackTraceBuilder.toString());
+            builder.fullMessage(event.getMessage().getFormattedMessage());
         }
-        
+
         if (!additionalFields.isEmpty()) {
-        	builder.additionalFields(additionalFields);
+            builder.additionalFields(additionalFields);
         }
 
         try {
@@ -139,6 +148,18 @@ public class GelfAppender extends AbstractAppender {
         } catch (Exception e) {
             throw new AppenderLoggingException("failed to write log event to GELF server: " + e.getMessage(), e);
         }
+    }
+
+    protected String getSimpleStacktraceAsString(final Throwable thrown) {
+        final StringBuilder stackTraceBuilder = new StringBuilder();
+        for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
+            new Formatter(stackTraceBuilder).format("%s.%s(%s:%d)%n",
+                    stackTraceElement.getClassName(),
+                    stackTraceElement.getMethodName(),
+                    stackTraceElement.getFileName(),
+                    stackTraceElement.getLineNumber());
+        }
+        return stackTraceBuilder.toString();
     }
 
     @Override
@@ -173,49 +194,62 @@ public class GelfAppender extends AbstractAppender {
     /**
      * Factory method for creating a {@link GelfTransport} provider within the plugin manager.
      *
-     * @param name                 The name of the Appender.
-     * @param filter               A Filter to determine if the event should be handled by this Appender.
-     * @param layout               The Layout to use to format the LogEvent defaults to {@code "%m%n"}.
-     * @param ignoreExceptions     The default is {@code true}, causing exceptions encountered while appending events
-     *                             to be internally logged and then ignored. When set to {@code false} exceptions will
-     *                             be propagated to the caller, instead. Must be set to {@code false} when wrapping this
-     *                             Appender in a {@link org.apache.logging.log4j.core.appender.FailoverAppender}.
-     * @param server               The server name of the GELF server, defaults to {@code localhost}.
-     * @param port                 The port the GELF server is listening on, defaults to {@code 12201}.
-     * @param hostName             The host name of the machine generating the logs, defaults to local host name
-     *                             or {@code localhost} if it couldn't be detected.
-     * @param protocol             The transport protocol to use, defaults to {@code UDP}.
-     * @param queueSize            The size of the internally used queue, defaults to {@code 512}.
-     * @param connectTimeout       The connection timeout for TCP connections in milliseconds, defaults to {@code 1000}.
-     * @param reconnectDelay       The time to wait between reconnects in milliseconds, defaults to {@code 500}.
-     * @param sendBufferSize       The size of the socket send buffer in bytes, defaults to {@code -1} (deactivate).
-     * @param tcpNoDelay           Whether Nagle's algorithm should be used for TCP connections, defaults to {@code false}.
-     * @param tcpKeepAlive         Whether to try keeping alive TCP connections, defaults to {@code false}.
-     * @param includeSource        Whether the source of the log message should be included, defaults to {@code true}.
-     * @param includeThreadContext Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
-     * @param includeStackTrace    Whether a full stack trace should be included, defaults to {@code true}.
-     * @param additionalFields     Additional static comma-delimited key=value pairs that will be added to every log message.
+     * @param name                  The name of the Appender.
+     * @param filter                A Filter to determine if the event should be handled by this Appender.
+     * @param layout                The Layout to use to format the LogEvent defaults to {@code "%m%n"}.
+     * @param ignoreExceptions      The default is {@code true}, causing exceptions encountered while appending events
+     *                              to be internally logged and then ignored. When set to {@code false} exceptions will
+     *                              be propagated to the caller, instead. Must be set to {@code false} when wrapping this
+     *                              Appender in a {@link org.apache.logging.log4j.core.appender.FailoverAppender}.
+     * @param server                The server name of the GELF server, defaults to {@code localhost}.
+     * @param port                  The port the GELF server is listening on, defaults to {@code 12201}.
+     * @param hostName              The host name of the machine generating the logs, defaults to local host name
+     *                              or {@code localhost} if it couldn't be detected.
+     * @param protocol              The transport protocol to use, defaults to {@code UDP}.
+     * @param queueSize             The size of the internally used queue, defaults to {@code 512}.
+     * @param connectTimeout        The connection timeout for TCP connections in milliseconds, defaults to {@code 1000}.
+     * @param reconnectDelay        The time to wait between reconnects in milliseconds, defaults to {@code 500}.
+     * @param sendBufferSize        The size of the socket send buffer in bytes, defaults to {@code -1} (deactivate).
+     * @param tcpNoDelay            Whether Nagle's algorithm should be used for TCP connections, defaults to {@code false}.
+     * @param tcpKeepAlive          Whether to try keeping alive TCP connections, defaults to {@code false}.
+     * @param includeSource         Whether the source of the log message should be included, defaults to {@code true}.
+     * @param includeThreadContext  Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
+     * @param includeStackTrace     Whether a full stack trace should be included, defaults to {@code true}.
+     * @param includeExceptionCause Whether the included stack trace should contain causing exceptions.
+     * @param additionalFields      Additional static comma-delimited key=value pairs that will be added to every log message.
      * @return a new GELF provider
      */
     @PluginFactory
     public static GelfAppender createGelfAppender(@PluginElement("Filter") Filter filter,
                                                   @PluginElement("Layout") Layout<? extends Serializable> layout,
                                                   @PluginAttribute(value = "name") String name,
-                                                  @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) Boolean ignoreExceptions,
+                                                  @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true)
+                                                  Boolean ignoreExceptions,
                                                   @PluginAttribute(value = "server", defaultString = "localhost") String server,
                                                   @PluginAttribute(value = "port", defaultInt = 12201) Integer port,
                                                   @PluginAttribute(value = "protocol", defaultString = "UDP") String protocol,
                                                   @PluginAttribute(value = "hostName") String hostName,
                                                   @PluginAttribute(value = "queueSize", defaultInt = 512) Integer queueSize,
-                                                  @PluginAttribute(value = "connectTimeout", defaultInt = 1000) Integer connectTimeout,
-                                                  @PluginAttribute(value = "reconnectDelay", defaultInt = 500) Integer reconnectDelay,
-                                                  @PluginAttribute(value = "sendBufferSize", defaultInt = -1) Integer sendBufferSize,
-                                                  @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false) Boolean tcpNoDelay,
-                                                  @PluginAttribute(value = "tcpKeepAlive", defaultBoolean = false) Boolean tcpKeepAlive,
-                                                  @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
-                                                  @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
-                                                  @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
-                                                  @PluginAttribute(value = "additionalFields") String additionalFields) {
+                                                  @PluginAttribute(value = "connectTimeout", defaultInt = 1000)
+                                                  Integer connectTimeout,
+                                                  @PluginAttribute(value = "reconnectDelay", defaultInt = 500)
+                                                  Integer reconnectDelay,
+                                                  @PluginAttribute(value = "sendBufferSize", defaultInt = -1)
+                                                  Integer sendBufferSize,
+                                                  @PluginAttribute(value = "tcpNoDelay", defaultBoolean = false)
+                                                  Boolean tcpNoDelay,
+                                                  @PluginAttribute(value = "tcpKeepAlive", defaultBoolean = false)
+                                                  Boolean tcpKeepAlive,
+                                                  @PluginAttribute(value = "includeSource", defaultBoolean = true)
+                                                  Boolean includeSource,
+                                                  @PluginAttribute(value = "includeThreadContext", defaultBoolean = true)
+                                                  Boolean includeThreadContext,
+                                                  @PluginAttribute(value = "includeStackTrace", defaultBoolean = true)
+                                                  Boolean includeStackTrace,
+                                                  @PluginAttribute(value = "additionalFields")
+                                                  String additionalFields,
+                                                  @PluginAttribute(value = "includeExceptionCause", defaultBoolean = false)
+                                                  Boolean includeExceptionCause) {
         if (name == null) {
             LOGGER.error("No name provided for ConsoleAppender");
             return null;
@@ -248,6 +282,6 @@ public class GelfAppender extends AbstractAppender {
                 .tcpKeepAlive(tcpKeepAlive);
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
-                includeThreadContext, includeStackTrace, additionalFields);
+                includeThreadContext, includeStackTrace, additionalFields, includeExceptionCause);
     }
 }
