@@ -29,6 +29,8 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * Whether the contents of the [ThreadContext](https://logging.apache.org/log4j/2.x/manual/thread-context.html) should be included
 * `includeStackTrace` (default: `true`)
   * Whether a full stack trace should be included
+* `includeExceptionCause` (default: `false`)
+  * Whether the included stack trace should contain causing exceptions
 * `queueSize` (default: `512`)
   * The size of the internally used queue
 * `connectTimeout` (default: `1000`)

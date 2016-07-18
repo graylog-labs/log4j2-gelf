@@ -21,7 +21,9 @@ import org.graylog2.gelfclient.GelfTransports;
 import org.graylog2.gelfclient.transport.GelfTransport;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -30,6 +32,8 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
@@ -42,6 +46,7 @@ public class GelfAppender extends AbstractAppender {
     private final boolean includeSource;
     private final boolean includeThreadContext;
     private final boolean includeStackTrace;
+    private final boolean includeExceptionCause;
     private final Map<String, Object> additionalFields;
 
     private GelfTransport client;
@@ -55,13 +60,15 @@ public class GelfAppender extends AbstractAppender {
                            final boolean includeSource,
                            final boolean includeThreadContext,
                            final boolean includeStackTrace,
-                           String additionalFields) {
+                           String additionalFields,
+                           final boolean includeExceptionCause) {
         super(name, filter, layout, ignoreExceptions);
         this.gelfConfiguration = gelfConfiguration;
         this.hostName = hostName;
         this.includeSource = includeSource;
         this.includeThreadContext = includeThreadContext;
         this.includeStackTrace = includeStackTrace;
+        this.includeExceptionCause = includeExceptionCause;
 
         if (null != additionalFields && !additionalFields.isEmpty()) {
             this.additionalFields = new HashMap<>();
@@ -115,20 +122,21 @@ public class GelfAppender extends AbstractAppender {
         @SuppressWarnings("all")
         final Throwable thrown = event.getThrown();
         if (includeStackTrace && thrown != null) {
-            final StringBuilder stackTraceBuilder = new StringBuilder();
-            for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
-                new Formatter(stackTraceBuilder).format("%s.%s(%s:%d)%n",
-                        stackTraceElement.getClassName(),
-                        stackTraceElement.getMethodName(),
-                        stackTraceElement.getFileName(),
-                        stackTraceElement.getLineNumber());
+            String stackTrace;
+            if (includeExceptionCause) {
+                final StringWriter stringWriter = new StringWriter();
+                final PrintWriter printWriter = new PrintWriter(stringWriter);
+                thrown.printStackTrace(printWriter);
+                stackTrace = stringWriter.toString();
+            } else {
+                stackTrace = getSimpleStacktraceAsString(thrown);
             }
 
             builder.additionalField("exceptionClass", thrown.getClass().getCanonicalName());
             builder.additionalField("exceptionMessage", thrown.getMessage());
-            builder.additionalField("exceptionStackTrace", stackTraceBuilder.toString());
+            builder.additionalField("exceptionStackTrace", stackTrace);
 
-            builder.fullMessage(event.getMessage().getFormattedMessage() + "\n\n" + stackTraceBuilder.toString());
+            builder.fullMessage(event.getMessage().getFormattedMessage());
         }
 
         if (!additionalFields.isEmpty()) {
@@ -142,6 +150,22 @@ public class GelfAppender extends AbstractAppender {
         }
     }
 
+    protected String getSimpleStacktraceAsString(final Throwable thrown) {
+        final StringBuilder stackTraceBuilder = new StringBuilder();
+        for (StackTraceElement stackTraceElement : thrown.getStackTrace()) {
+            new Formatter(stackTraceBuilder).format("%s.%s(%s:%d)%n",
+                    stackTraceElement.getClassName(),
+                    stackTraceElement.getMethodName(),
+                    stackTraceElement.getFileName(),
+                    stackTraceElement.getLineNumber());
+        }
+        return stackTraceBuilder.toString();
+    }
+
+    protected void setClient(GelfTransport client) {
+        this.client = requireNonNull(client);
+    }
+
     @Override
     public void start() {
         super.start();
@@ -151,7 +175,9 @@ public class GelfAppender extends AbstractAppender {
     @Override
     public void stop() {
         super.stop();
-        client.stop();
+        if (client != null) {
+            client.stop();
+        }
     }
 
     @Override
@@ -202,6 +228,7 @@ public class GelfAppender extends AbstractAppender {
      * @param includeSource                    Whether the source of the log message should be included, defaults to {@code true}.
      * @param includeThreadContext             Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
      * @param includeStackTrace                Whether a full stack trace should be included, defaults to {@code true}.
+     * @param includeExceptionCause            Whether the included stack trace should contain causing exceptions, defaults to {@code false}.
      * @param additionalFields                 Additional static comma-delimited key=value pairs that will be added to every log message.
      * @return a new GELF provider
      */
@@ -223,6 +250,7 @@ public class GelfAppender extends AbstractAppender {
                                                   @PluginAttribute(value = "includeSource", defaultBoolean = true) Boolean includeSource,
                                                   @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
                                                   @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
+                                                  @PluginAttribute(value = "includeExceptionCause", defaultBoolean = false) Boolean includeExceptionCause,
                                                   @PluginAttribute(value = "additionalFields") String additionalFields,
                                                   @PluginAttribute(value = "tlsEnabled", defaultBoolean = false) Boolean tlsEnabled,
                                                   @PluginAttribute(value = "tlsEnableCertificateVerification", defaultBoolean = true) Boolean tlsEnableCertificateVerification,
@@ -274,6 +302,6 @@ public class GelfAppender extends AbstractAppender {
         }
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
-                includeThreadContext, includeStackTrace, additionalFields);
+                includeThreadContext, includeStackTrace, additionalFields, includeExceptionCause);
     }
 }

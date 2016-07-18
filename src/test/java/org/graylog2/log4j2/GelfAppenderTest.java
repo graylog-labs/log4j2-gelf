@@ -9,6 +9,7 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 public class GelfAppenderTest {
+
     @Test
     public void testLog() {
         final Logger logger = LogManager.getLogger("test");
@@ -28,7 +29,7 @@ public class GelfAppenderTest {
         final Logger logger = LogManager.getLogger("test");
 
         try {
-            throw new Exception("Test");
+            throw new Exception("Test", new Exception("Cause", new RuntimeException("Inner Cause")));
         } catch (Exception e) {
             e.fillInStackTrace();
             logger.error("Hello World", e);
@@ -41,7 +42,7 @@ public class GelfAppenderTest {
 
         ThreadContext.push("Message only");
         ThreadContext.push("int", 1);
-        ThreadContext.push("int-long-string", 1, 2l, "3");
+        ThreadContext.push("int-long-string", 1, 2L, "3");
         ThreadContext.put("key", "value");
 
         logger.info("Hello World");
