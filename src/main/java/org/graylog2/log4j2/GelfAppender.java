@@ -15,6 +15,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.net.Severity;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.graylog2.gelfclient.GelfConfiguration;
+import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.GelfMessageBuilder;
 import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.GelfTransports;
@@ -143,8 +144,12 @@ public class GelfAppender extends AbstractAppender {
             builder.additionalFields(additionalFields);
         }
 
+        final GelfMessage gelfMessage = builder.build();
         try {
-            client.send(builder.build());
+            final boolean sent = client.trySend(gelfMessage);
+            if (!sent) {
+                LOG.debug("Couldn't send message: {}", gelfMessage);
+            }
         } catch (Exception e) {
             throw new AppenderLoggingException("failed to write log event to GELF server: " + e.getMessage(), e);
         }
