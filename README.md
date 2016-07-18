@@ -17,6 +17,12 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * The host name of the machine generating the logs
 * `protocol` (default: `UDP`)
   * The transport protocol to use
+* `tlsEnabled` (default: `false`)
+  * Whether TLS should be enabled
+* `tlsEnableCertificateVerification` (default: `true`)
+  * Whether the TLS certificate chain should be checked
+* `tlsTrustCertChainFilename`  (default: empty)
+  * A X.509 certificate chain file in PEM format for certificate verification
 * `includeSource` (default: `true`)
   * Whether the source of the log message should be included
 * `includeThreadContext` (default: `true`)
