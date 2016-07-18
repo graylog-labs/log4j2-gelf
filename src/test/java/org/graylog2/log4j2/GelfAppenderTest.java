@@ -9,6 +9,7 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 public class GelfAppenderTest {
+
     @Test
     public void testLog() {
         final Logger logger = LogManager.getLogger("test");
@@ -28,7 +29,7 @@ public class GelfAppenderTest {
         final Logger logger = LogManager.getLogger("test");
 
         try {
-            throw new Exception("Test");
+            throw new Exception("Test", new Exception("Cause", new RuntimeException("Inner Cause")));
         } catch (Exception e) {
             e.fillInStackTrace();
             logger.error("Hello World", e);
