@@ -1,5 +1,7 @@
 # GELF Appender for Apache Log4j 2
+[![License](https://img.shields.io/github/license/Graylog2/log4j2-gelf.svg?maxAge=2592000)](LICENSE.txt)
 [![Build Status](https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master)](https://travis-ci.org/Graylog2/log4j2-gelf)
+[![Maven Central](https://img.shields.io/maven-central/v/org.graylog2.log4j2/log4j2-gelf.svg?maxAge=2592000)](http://mvnrepository.com/artifact/org.graylog2.log4j2/log4j2-gelf)
 
 This appender for [Apache Log4j 2](https://logging.apache.org/log4j/2.x/) logs messages to a GELF server like [Graylog2](http://www.graylog2.org) or [logstash](http://logstash.net).
 
@@ -112,8 +114,9 @@ Please read up on the different variable handling in the linked Javadocs.
 | 1.0.2                            | 09-Feb-2015  |
 | 1.0.3                            | 11-Feb-2015  |
 | 1.1.0                            | 16-Jul-2015  |
+| 1.2.0                            | 18-Jul-2016  |
 
-This appender uses GELF Java client 1.3.0.
+This appender uses GELF Java client 1.4.0.
 
 
 # Installation
@@ -133,7 +136,7 @@ Maven coordinates
 
 GELF Appender for Apache Log4j 2
 
-Copyright (C) 2014 TORCH GmbH; 2015 Graylog, Inc.
+Copyright (C) 2014 TORCH GmbH; 2015-2016 Graylog, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
