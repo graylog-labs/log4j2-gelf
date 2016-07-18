@@ -6,8 +6,12 @@ import org.apache.logging.log4j.message.Message;
 import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.transport.GelfTransport;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -16,16 +20,21 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class GelfAppenderThrowableTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    @Mock
     private GelfTransport mockedGelfTransport;
 
     @Before
     public void setUp() {
-        mockedGelfTransport = mock(GelfTransport.class);
+        when(mockedGelfTransport.trySend(any(GelfMessage.class))).thenReturn(true);
     }
 
     @Test
@@ -40,7 +49,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final String fullMessage = gelfMessageCaptor.getValue().getFullMessage();
         assertThat(fullMessage, is("Some Message"));
     }
@@ -57,7 +66,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final Object exceptionMessage = gelfMessageCaptor.getValue()
                 .getAdditionalFields()
                 .get("exceptionMessage");
@@ -82,7 +91,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final Object exceptionMessage = gelfMessageCaptor.getValue()
                 .getAdditionalFields()
                 .get("exceptionMessage");
@@ -109,7 +118,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final Object exceptionMessage = gelfMessageCaptor.getValue()
                 .getAdditionalFields()
                 .get("exceptionMessage");
@@ -136,7 +145,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final Object exceptionStackTrace = gelfMessageCaptor.getValue()
                 .getAdditionalFields()
                 .get("exceptionStackTrace");
@@ -157,7 +166,7 @@ public class GelfAppenderThrowableTest {
 
         // then
         ArgumentCaptor<GelfMessage> gelfMessageCaptor = ArgumentCaptor.forClass(GelfMessage.class);
-        verify(mockedGelfTransport).send(gelfMessageCaptor.capture());
+        verify(mockedGelfTransport).trySend(gelfMessageCaptor.capture());
         final Object exceptionStackTrace = gelfMessageCaptor.getValue()
                 .getAdditionalFields()
                 .get("exceptionStackTrace");
