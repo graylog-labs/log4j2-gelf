@@ -112,12 +112,14 @@ public class GelfAppender extends AbstractAppender {
             }
         }
 
-        final StackTraceElement source = event.getSource();
-        if (includeSource && source != null) {
-            builder.additionalField("sourceFileName", source.getFileName());
-            builder.additionalField("sourceMethodName", source.getMethodName());
-            builder.additionalField("sourceClassName", source.getClassName());
-            builder.additionalField("sourceLineNumber", source.getLineNumber());
+        if (includeSource) {
+            final StackTraceElement source = event.getSource();
+            if (source != null) {
+                builder.additionalField("sourceFileName", source.getFileName());
+                builder.additionalField("sourceMethodName", source.getMethodName());
+                builder.additionalField("sourceClassName", source.getClassName());
+                builder.additionalField("sourceLineNumber", source.getLineNumber());
+            }
         }
 
         @SuppressWarnings("all")
