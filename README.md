@@ -130,6 +130,7 @@ Please read up on the different variable handling in the linked Javadocs.
 | 1.1.0                            | 16-Jul-2015  |
 | 1.2.0                            | 18-Jul-2016  |
 | 1.2.1                            | 11-Aug-2016  |
+| 1.3.0                            | 24-Aug-2016  |
 
 This appender uses GELF Java client 1.4.0.
 
@@ -142,7 +143,7 @@ Maven coordinates
         <dependency>
             <groupId>org.graylog2.log4j2</groupId>
             <artifactId>log4j2-gelf</artifactId>
-            <version>1.2.1</version>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 
