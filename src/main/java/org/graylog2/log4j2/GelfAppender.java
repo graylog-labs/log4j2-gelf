@@ -2,6 +2,7 @@ package org.graylog2.log4j2;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -106,9 +107,13 @@ public class GelfAppender extends AbstractAppender {
                 builder.additionalField(entry.getKey(), entry.getValue());
             }
 
-            final List<String> contextStack = event.getContextStack().asList();
-            if (contextStack != null && !contextStack.isEmpty()) {
-                builder.additionalField("contextStack", contextStack.toString());
+            // Guard against https://issues.apache.org/jira/browse/LOG4J2-1530
+            final ThreadContext.ContextStack contextStack = event.getContextStack();
+            if (contextStack != null) {
+                final List<String> contextStackItems = contextStack.asList();
+                if (contextStackItems != null && !contextStackItems.isEmpty()) {
+                    builder.additionalField("contextStack", contextStackItems.toString());
+                }
             }
         }
 
