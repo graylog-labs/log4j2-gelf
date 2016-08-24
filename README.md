@@ -92,7 +92,7 @@ This in turn is utilizing the following [Log4j Lookups](https://logging.apache.o
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `date`       | [DateLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html)                                         |
 | `sd`         | [StructuredDataLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html)                     |
-| `java`       | [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)                 |
+| `java`       | [JavaLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JavaLookup.html)                                         |
 | `ctx`        | [ContextMapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ContextMapLookup.html)                             |
 | `jndi`       | [JndiLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JndiLookup.html)                                         |
 | `jvmrunargs` | [JmxRuntimeInputArgumentsLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup.html) |
