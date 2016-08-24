@@ -90,16 +90,16 @@ This in turn is utilizing the following [Log4j Lookups](https://logging.apache.o
 
 | Prefix       | Documentation                                                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `date`       | [DateLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html)                                         |
-| `sd`         | [StructuredDataLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html)                     |
-| `java`       | [JavaLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JavaLookup.html)                                         |
 | `ctx`        | [ContextMapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ContextMapLookup.html)                             |
+| `bundle`     | [ResourceBundleLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ResourceBundleLookup.html)                     |
+| `date`       | [DateLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html)                                         |
+| `env`        | [EnvironmentLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/EnvironmentLookup.html)                           |
+| `java`       | [JavaLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JavaLookup.html)                                         |
 | `jndi`       | [JndiLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JndiLookup.html)                                         |
 | `jvmrunargs` | [JmxRuntimeInputArgumentsLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup.html) |
-| `env`        | [EnvironmentLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/EnvironmentLookup.html)                           |
-| `sys`        | [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)                 |
 | `map`        | [MapLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/MapLookup.html)                                           |
-| `bundle`     | [ResourceBundleLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ResourceBundleLookup.html)                     |
+| `sd`         | [StructuredDataLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html)                     |
+| `sys`        | [SystemPropertiesLookup](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html)                 |
 
 Please read up on the different variable handling in the linked Javadocs.
 
