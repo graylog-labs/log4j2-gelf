@@ -51,20 +51,23 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) to use to format the LogEvent
 * `ignoreExceptions`
   * The default is `true`, causing exceptions encountered while appending events to be internally logged and then ignored. When set to `false` exceptions will be propagated to the caller, instead. Must be set to `false` when wrapping this Appender in a `FailoverAppender`.
-* `additionalFields`
-  * Comma-delimited list of key=value pairs to be included in every message
+* Additional Fields
+  * Additional fields can be added with `KeyValuePair` elements inside the `GELF` element.
 
 ## log4j2.xml example
 
     <?xml version="1.0" encoding="UTF-8"?>
     <Configuration status="OFF" packages="org.graylog2.log4j2">
         <Appenders>
-            <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com" additionalFields="foo=bar">
+            <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com">
                 <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
                 <Filters>
                     <Filter type="MarkerFilter" marker="FLOW" onMatch="DENY" onMismatch="NEUTRAL"/>
                     <Filter type="MarkerFilter" marker="EXCEPTION" onMatch="DENY" onMismatch="ACCEPT"/>
                 </Filters>
+                <!-- Additional fields -->
+                <KeyValuePair key="foo" value="bar"/>
+                <KeyValuePair key="jvm" value="${java:vm}"/>                
             </GELF>
         </Appenders>
         <Loggers>
@@ -81,11 +84,14 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
     ThreadContext.put("userId", "testUser");
     logger.info("Hello World");
 
-## Using variables in the additionalFields
+## Using variables in the additional fields
 
-The `additionalFields` attribute can contain references to variables. 
+The additional fields (`KeyValuePair` elements) can contain references to variables. 
+
 In order for Log4j 2.x to resolve the variable's value, the variable name must have a certain prefix depending on how the variable is provided.
+
 Internally we're making use of Log4j's [StrSubstitutor](https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StrSubstitutor.html) to resolve the variable's value. 
+
 This in turn is utilizing the following [Log4j Lookups](https://logging.apache.org/log4j/2.x/manual/lookups.html) with the prefixes in the following list:
 
 | Prefix       | Documentation                                                                                                                                                      |
@@ -105,11 +111,12 @@ Please read up on the different variable handling in the linked Javadocs.
 
 ### Example configuration with variables
 
-    <GELF name="gelfAppender" 
-      server="graylog2.example.com" 
-      port="12201" 
-      hostName="appserver01.example.com" 
-      additionalFields="user=${env:USER},CLIargument=${sys:cliargument},jvm=${java:vm},fileEncoding=${sys:file.encoding}"/>
+    <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com">
+        <KeyValuePair key="user" value="${env:USER}"/>
+        <KeyValuePair key="CLIargument" value="${sys:cliargument}"/>
+        <KeyValuePair key="jvm" value="${java:vm}"/>
+        <KeyValuePair key="fileEncoding" value="${sys:file.encoding}"/>
+    </GELF>
 
 
 # Versions

@@ -14,6 +14,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.net.Severity;
+import org.apache.logging.log4j.core.util.KeyValuePair;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.graylog2.gelfclient.GelfConfiguration;
 import org.graylog2.gelfclient.GelfMessage;
@@ -62,7 +63,7 @@ public class GelfAppender extends AbstractAppender {
                            final boolean includeSource,
                            final boolean includeThreadContext,
                            final boolean includeStackTrace,
-                           String additionalFields,
+                           final KeyValuePair[] additionalFields,
                            final boolean includeExceptionCause) {
         super(name, filter, layout, ignoreExceptions);
         this.gelfConfiguration = gelfConfiguration;
@@ -72,17 +73,10 @@ public class GelfAppender extends AbstractAppender {
         this.includeStackTrace = includeStackTrace;
         this.includeExceptionCause = includeExceptionCause;
 
-        if (null != additionalFields && !additionalFields.isEmpty()) {
+        if (null != additionalFields) {
             this.additionalFields = new HashMap<>();
-
-            try {
-                String[] values = additionalFields.split(",");
-                for (String s : values) {
-                    String[] nvp = s.split("=");
-                    this.additionalFields.put(nvp[0], nvp[1]);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Failed to read additional fields.", e);
+            for (KeyValuePair pair : additionalFields) {
+                this.additionalFields.put(pair.getKey(), pair.getValue());
             }
         } else {
             this.additionalFields = Collections.emptyMap();
@@ -241,12 +235,13 @@ public class GelfAppender extends AbstractAppender {
      * @param includeThreadContext             Whether the contents of the {@link org.apache.logging.log4j.ThreadContext} should be included, defaults to {@code true}.
      * @param includeStackTrace                Whether a full stack trace should be included, defaults to {@code true}.
      * @param includeExceptionCause            Whether the included stack trace should contain causing exceptions, defaults to {@code false}.
-     * @param additionalFields                 Additional static comma-delimited key=value pairs that will be added to every log message.
+     * @param additionalFields                 Additional static key=value pairs that will be added to every log message.
      * @return a new GELF provider
      */
     @PluginFactory
     public static GelfAppender createGelfAppender(@PluginElement("Filter") Filter filter,
                                                   @PluginElement("Layout") Layout<? extends Serializable> layout,
+                                                  @PluginElement(value = "AdditionalFields") final KeyValuePair[] additionalFields,
                                                   @PluginAttribute(value = "name") String name,
                                                   @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) Boolean ignoreExceptions,
                                                   @PluginAttribute(value = "server", defaultString = "localhost") String server,
@@ -263,7 +258,6 @@ public class GelfAppender extends AbstractAppender {
                                                   @PluginAttribute(value = "includeThreadContext", defaultBoolean = true) Boolean includeThreadContext,
                                                   @PluginAttribute(value = "includeStackTrace", defaultBoolean = true) Boolean includeStackTrace,
                                                   @PluginAttribute(value = "includeExceptionCause", defaultBoolean = false) Boolean includeExceptionCause,
-                                                  @PluginAttribute(value = "additionalFields") String additionalFields,
                                                   @PluginAttribute(value = "tlsEnabled", defaultBoolean = false) Boolean tlsEnabled,
                                                   @PluginAttribute(value = "tlsEnableCertificateVerification", defaultBoolean = true) Boolean tlsEnableCertificateVerification,
                                                   @PluginAttribute(value = "tlsTrustCertChainFilename") String tlsTrustCertChainFilename) {
