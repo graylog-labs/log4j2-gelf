@@ -1,28 +1,39 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Log4j2-gelf by Graylog2</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Log4j2-gelf</h1>
-      <h2 class="project-tagline">GELF Appender for Apache Log4j 2</h2>
-      <a href="https://github.com/Graylog2/log4j2-gelf" class="btn">View on GitHub</a>
-      <a href="https://github.com/Graylog2/log4j2-gelf/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/Graylog2/log4j2-gelf/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+    <div class="wrapper">
+      <header>
+        <h1>Log4j2-gelf</h1>
+        <p>GELF Appender for Apache Log4j 2</p>
 
-    <section class="main-content">
-      <h1>
-<a id="gelf-appender-for-apache-log4j-2" class="anchor" href="#gelf-appender-for-apache-log4j-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>GELF Appender for Apache Log4j 2</h1>
+        <p class="view"><a href="https://github.com/Graylog2/log4j2-gelf">View the Project on GitHub <small>Graylog2/log4j2-gelf</small></a></p>
 
-<p><a href="https://travis-ci.org/Graylog2/log4j2-gelf"><img src="https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master" alt="Build Status"></a></p>
+
+        <ul>
+          <li><a href="https://github.com/Graylog2/log4j2-gelf/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Graylog2/log4j2-gelf/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Graylog2/log4j2-gelf">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="gelf-appender-for-apache-log4j-2" class="anchor" href="#gelf-appender-for-apache-log4j-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GELF Appender for Apache Log4j 2</h1>
+
+<p><a href="LICENSE.txt"><img src="https://img.shields.io/github/license/Graylog2/log4j2-gelf.svg?maxAge=2592000" alt="License"></a>
+<a href="https://travis-ci.org/Graylog2/log4j2-gelf"><img src="https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master" alt="Build Status"></a>
+<a href="http://mvnrepository.com/artifact/org.graylog2.log4j2/log4j2-gelf"><img src="https://img.shields.io/maven-central/v/org.graylog2.log4j2/log4j2-gelf.svg?maxAge=2592000" alt="Maven Central"></a></p>
 
 <p>This appender for <a href="https://logging.apache.org/log4j/2.x/">Apache Log4j 2</a> logs messages to a GELF server like <a href="http://www.graylog2.org">Graylog2</a> or <a href="http://logstash.net">logstash</a>.</p>
 
@@ -67,6 +78,27 @@
 </ul>
 </li>
 <li>
+<code>tlsEnabled</code> (default: <code>false</code>)
+
+<ul>
+<li>Whether TLS should be enabled</li>
+</ul>
+</li>
+<li>
+<code>tlsEnableCertificateVerification</code> (default: <code>true</code>)
+
+<ul>
+<li>Whether the TLS certificate chain should be checked</li>
+</ul>
+</li>
+<li>
+<code>tlsTrustCertChainFilename</code>  (default: empty)
+
+<ul>
+<li>A X.509 certificate chain file in PEM format for certificate verification</li>
+</ul>
+</li>
+<li>
 <code>includeSource</code> (default: <code>true</code>)
 
 <ul>
@@ -85,6 +117,13 @@
 
 <ul>
 <li>Whether a full stack trace should be included</li>
+</ul>
+</li>
+<li>
+<code>includeExceptionCause</code> (default: <code>false</code>)
+
+<ul>
+<li>Whether the included stack trace should contain causing exceptions</li>
 </ul>
 </li>
 <li>
@@ -130,17 +169,17 @@
 </ul>
 </li>
 <li>
-<code>filter</code>
+<code>Filter</code> elements
 
 <ul>
 <li>A <a href="https://logging.apache.org/log4j/2.x/manual/filters.html">Filter</a> to determine if the event should be handled by this Appender</li>
 </ul>
 </li>
 <li>
-<code>layout</code> (default: <code>"%m%n"</code>)
+<code>Layout</code> element (default: none)
 
 <ul>
-<li>The <a href="https://logging.apache.org/log4j/2.x/manual/layouts.html">Layout</a> to use to format the LogEvent</li>
+<li>The <a href="https://logging.apache.org/log4j/2.x/manual/layouts.html">Layout</a> used to format the LogEvent</li>
 </ul>
 </li>
 <li>
@@ -150,40 +189,124 @@
 <li>The default is <code>true</code>, causing exceptions encountered while appending events to be internally logged and then ignored. When set to <code>false</code> exceptions will be propagated to the caller, instead. Must be set to <code>false</code> when wrapping this Appender in a <code>FailoverAppender</code>.</li>
 </ul>
 </li>
-<li>
-<code>additionalFields</code>
+<li>Additional Fields
 
 <ul>
-<li>Comma-delimited list of key=value pairs to be included in every message</li>
+<li>Additional fields can be added with <code>KeyValuePair</code> elements inside the <code>GELF</code> element.</li>
 </ul>
 </li>
 </ul>
 
 <h2>
-<a id="log4j2xml-example" class="anchor" href="#log4j2xml-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Log4j2.xml example</h2>
+<a id="log4j2xml-example" class="anchor" href="#log4j2xml-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>log4j2.xml example</h2>
 
-<pre><code>&lt;configuration status="OFF" packages="org.graylog2.log4j2"&gt;
-    &lt;appenders&gt;
-        &lt;GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com" additionalFields="foo=bar"/&gt;
-    &lt;/appenders&gt;
-    &lt;loggers&gt;
-        &lt;root level="info"&gt;
-            &lt;appender-ref ref="gelfAppender"/&gt;
-        &lt;/root&gt;
-    &lt;/loggers&gt;
-&lt;/configuration&gt;
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Configuration status="OFF" packages="org.graylog2.log4j2"&gt;
+    &lt;Appenders&gt;
+        &lt;GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com"&gt;
+            &lt;PatternLayout pattern="%logger{36} - %msg%n"/&gt;
+            &lt;Filters&gt;
+                &lt;Filter type="MarkerFilter" marker="FLOW" onMatch="DENY" onMismatch="NEUTRAL"/&gt;
+                &lt;Filter type="MarkerFilter" marker="EXCEPTION" onMatch="DENY" onMismatch="ACCEPT"/&gt;
+            &lt;/Filters&gt;
+            &lt;!-- Additional fields --&gt;
+            &lt;KeyValuePair key="foo" value="bar"/&gt;
+            &lt;KeyValuePair key="jvm" value="${java:vm}"/&gt;                
+        &lt;/GELF&gt;
+    &lt;/Appenders&gt;
+    &lt;Loggers&gt;
+        &lt;Root level="info"&gt;
+            &lt;AppenderRef ref="gelfAppender"/&gt;
+        &lt;/Root&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
 </code></pre>
 
 <h2>
-<a id="java-code-example" class="anchor" href="#java-code-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Java code example</h2>
+<a id="java-code-example" class="anchor" href="#java-code-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Java code example</h2>
 
 <pre><code>Logger logger = LogManager.getLogger("test");
 ThreadContext.put("userId", "testUser");
 logger.info("Hello World");
 </code></pre>
 
+<h2>
+<a id="using-variables-in-the-additional-fields" class="anchor" href="#using-variables-in-the-additional-fields" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using variables in the additional fields</h2>
+
+<p>The additional fields (<code>KeyValuePair</code> elements) can contain references to variables. </p>
+
+<p>In order for Log4j 2.x to resolve the variable's value, the variable name must have a certain prefix depending on how the variable is provided.</p>
+
+<p>Internally we're making use of Log4j's <a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StrSubstitutor.html">StrSubstitutor</a> to resolve the variable's value. </p>
+
+<p>This in turn is utilizing the following <a href="https://logging.apache.org/log4j/2.x/manual/lookups.html">Log4j Lookups</a> with the prefixes in the following list:</p>
+
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctx</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ContextMapLookup.html">ContextMapLookup</a></td>
+</tr>
+<tr>
+<td><code>bundle</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/ResourceBundleLookup.html">ResourceBundleLookup</a></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/DateLookup.html">DateLookup</a></td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/EnvironmentLookup.html">EnvironmentLookup</a></td>
+</tr>
+<tr>
+<td><code>java</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JavaLookup.html">JavaLookup</a></td>
+</tr>
+<tr>
+<td><code>jndi</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JndiLookup.html">JndiLookup</a></td>
+</tr>
+<tr>
+<td><code>jvmrunargs</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup.html">JmxRuntimeInputArgumentsLookup</a></td>
+</tr>
+<tr>
+<td><code>map</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/MapLookup.html">MapLookup</a></td>
+</tr>
+<tr>
+<td><code>sd</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/StructuredDataLookup.html">StructuredDataLookup</a></td>
+</tr>
+<tr>
+<td><code>sys</code></td>
+<td><a href="https://logging.apache.org/log4j/2.x/log4j-core/apidocs/org/apache/logging/log4j/core/lookup/SystemPropertiesLookup.html">SystemPropertiesLookup</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>Please read up on the different variable handling in the linked Javadocs.</p>
+
+<h3>
+<a id="example-configuration-with-variables" class="anchor" href="#example-configuration-with-variables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example configuration with variables</h3>
+
+<pre><code>&lt;GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com"&gt;
+    &lt;KeyValuePair key="user" value="${env:USER}"/&gt;
+    &lt;KeyValuePair key="CLIargument" value="${sys:cliargument}"/&gt;
+    &lt;KeyValuePair key="jvm" value="${java:vm}"/&gt;
+    &lt;KeyValuePair key="fileEncoding" value="${sys:file.encoding}"/&gt;
+&lt;/GELF&gt;
+</code></pre>
+
 <h1>
-<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Versions</h1>
+<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Versions</h1>
 
 <table>
 <thead>
@@ -213,13 +336,25 @@ logger.info("Hello World");
 <td>1.1.0</td>
 <td>16-Jul-2015</td>
 </tr>
+<tr>
+<td>1.2.0</td>
+<td>18-Jul-2016</td>
+</tr>
+<tr>
+<td>1.2.1</td>
+<td>11-Aug-2016</td>
+</tr>
+<tr>
+<td>1.3.0</td>
+<td>24-Aug-2016</td>
+</tr>
 </tbody>
 </table>
 
-<p>This appender uses GELF Java client 1.3.0.</p>
+<p>This appender uses GELF Java client 1.4.0.</p>
 
 <h1>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
 
 <p>Maven coordinates</p>
 
@@ -227,17 +362,17 @@ logger.info("Hello World");
     &lt;dependency&gt;
         &lt;groupId&gt;org.graylog2.log4j2&lt;/groupId&gt;
         &lt;artifactId&gt;log4j2-gelf&lt;/artifactId&gt;
-        &lt;version&gt;1.1.0&lt;/version&gt;
+        &lt;version&gt;1.3.0&lt;/version&gt;
     &lt;/dependency&gt;
 &lt;/dependencies&gt;
 </code></pre>
 
 <h1>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
 
 <p>GELF Appender for Apache Log4j 2</p>
 
-<p>Copyright (C) 2014 TORCH GmbH; 2015 Graylog, Inc.</p>
+<p>Copyright (C) 2014 TORCH GmbH; 2015-2016 Graylog, Inc.</p>
 
 <p>Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -251,16 +386,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</p>
-
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/Graylog2/log4j2-gelf">Log4j2-gelf</a> is maintained by <a href="https://github.com/Graylog2">Graylog2</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Graylog2">Graylog2</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
-
-    </section>
-
-  
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
-
