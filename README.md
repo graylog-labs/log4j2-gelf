@@ -47,8 +47,8 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
   * Whether to try keeping alive TCP connections.
 * `Filter` elements
   * A [Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to determine if the event should be handled by this Appender
-* `Layout` element (default: [`PatternLayout`](https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout) with pattern `"%m%n"`)
-  * The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) to use to format the LogEvent
+* `Layout` element (default: none)
+  * The [Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html) used to format the LogEvent
 * `ignoreExceptions`
   * The default is `true`, causing exceptions encountered while appending events to be internally logged and then ignored. When set to `false` exceptions will be propagated to the caller, instead. Must be set to `false` when wrapping this Appender in a `FailoverAppender`.
 * Additional Fields
@@ -60,7 +60,7 @@ You can specify the following parameters for the GELF appender in the `log4j2.xm
     <Configuration status="OFF" packages="org.graylog2.log4j2">
         <Appenders>
             <GELF name="gelfAppender" server="graylog2.example.com" port="12201" hostName="appserver01.example.com">
-                <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+                <PatternLayout pattern="%logger{36} - %msg%n"/>
                 <Filters>
                     <Filter type="MarkerFilter" marker="FLOW" onMatch="DENY" onMismatch="NEUTRAL"/>
                     <Filter type="MarkerFilter" marker="EXCEPTION" onMatch="DENY" onMismatch="ACCEPT"/>

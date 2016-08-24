@@ -12,7 +12,6 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.net.Severity;
 import org.apache.logging.log4j.core.util.KeyValuePair;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -30,6 +29,7 @@ import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -85,7 +85,15 @@ public class GelfAppender extends AbstractAppender {
 
     @Override
     public void append(LogEvent event) {
-        final GelfMessageBuilder builder = new GelfMessageBuilder(event.getMessage().getFormattedMessage(), hostName)
+        final Layout<? extends Serializable> layout = getLayout();
+        final String formattedMessage;
+        if (layout == null) {
+            formattedMessage = event.getMessage().getFormattedMessage();
+        } else {
+            formattedMessage = new String(layout.toByteArray(event), StandardCharsets.UTF_8);
+        }
+
+        final GelfMessageBuilder builder = new GelfMessageBuilder(formattedMessage, hostName)
                 .timestamp(event.getTimeMillis() / 1000d)
                 .level(GelfMessageLevel.fromNumericLevel(Severity.getSeverity(event.getLevel()).getCode()))
                 .additionalField("loggerName", event.getLoggerName())
@@ -138,7 +146,7 @@ public class GelfAppender extends AbstractAppender {
             builder.additionalField("exceptionMessage", thrown.getMessage());
             builder.additionalField("exceptionStackTrace", stackTrace);
 
-            builder.fullMessage(event.getMessage().getFormattedMessage());
+            builder.fullMessage(formattedMessage);
         }
 
         if (!additionalFields.isEmpty()) {
@@ -265,9 +273,7 @@ public class GelfAppender extends AbstractAppender {
             LOGGER.error("No name provided for ConsoleAppender");
             return null;
         }
-        if (layout == null) {
-            layout = PatternLayout.createDefaultLayout();
-        }
+
         if (!"UDP".equalsIgnoreCase(protocol) && !"TCP".equalsIgnoreCase(protocol)) {
             LOG.warn("Invalid protocol {}, falling back to UDP", protocol);
             protocol = "UDP";
