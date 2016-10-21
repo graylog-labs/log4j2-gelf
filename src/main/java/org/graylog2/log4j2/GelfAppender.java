@@ -35,13 +35,17 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
     private static final long serialVersionUID = 4796033328540158817L;
-    private static final String REGEX_IP_ADDRESS = "\\d+(\\.\\d+){3}";
+    private static final String REGEX_IP4_ADDRESS = "[:0-9a-f]*(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
+    private static final String REGEX_IP6_ADDRESS = "([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}";
+    private static Pattern IPV4_PATTERN = Pattern.compile(REGEX_IP4_ADDRESS);
+    private static Pattern IPV6_PATTERN = Pattern.compile(REGEX_IP6_ADDRESS);
     private static final Logger LOG = StatusLogger.getLogger();
 
     private final GelfConfiguration gelfConfiguration;
@@ -322,7 +326,9 @@ public class GelfAppender extends AbstractAppender {
                 includeThreadContext, includeStackTrace, additionalFields, includeExceptionCause);
     }
 
-    private static boolean isFQDN(String canonicalHostName) {
-        return canonicalHostName.contains(".") && !canonicalHostName.matches(REGEX_IP_ADDRESS);
+    public static boolean isFQDN(String canonicalHostName) {
+        return canonicalHostName.contains(".") &&
+                !IPV4_PATTERN.matcher(canonicalHostName).matches() &&
+                !IPV6_PATTERN.matcher(canonicalHostName).matches();
     }
 }

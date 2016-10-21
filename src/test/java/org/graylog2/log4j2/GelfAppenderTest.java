@@ -1,24 +1,32 @@
 package org.graylog2.log4j2;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 public class GelfAppenderTest {
+    private Logger logger;
+
+    @Before
+    public void setUp() {
+        logger = LogManager.getLogger("test");
+    }
 
     @Test
     public void testLog() {
-        final Logger logger = LogManager.getLogger("test");
         logger.info("Hello World");
     }
 
     @Test
     public void testMarker() {
-        final Logger logger = LogManager.getLogger("test");
         final Marker parent = MarkerManager.getMarker("PARENT");
         final Marker marker = MarkerManager.getMarker("TEST").addParents(parent);
         logger.info(marker, "Hello World");
@@ -26,8 +34,6 @@ public class GelfAppenderTest {
 
     @Test
     public void testException() {
-        final Logger logger = LogManager.getLogger("test");
-
         try {
             throw new Exception("Test", new Exception("Cause", new RuntimeException("Inner Cause")));
         } catch (Exception e) {
@@ -38,8 +44,6 @@ public class GelfAppenderTest {
 
     @Test
     public void testThreadContext() {
-        final Logger logger = LogManager.getLogger("test");
-
         ThreadContext.push("Message only");
         ThreadContext.push("int", 1);
         ThreadContext.push("int-long-string", 1, 2L, "3");
@@ -48,6 +52,16 @@ public class GelfAppenderTest {
         logger.info("Hello World");
 
         ThreadContext.clearAll();
+    }
+
+    @Test
+    public void testIsFqdn() {
+        assertThat(GelfAppender.isFQDN("host"), equalTo(false));
+        assertThat(GelfAppender.isFQDN("123.123.56.53"), equalTo(false));
+        assertThat(GelfAppender.isFQDN("1080:0:0:0:8:800:200C:417A"), equalTo(false));
+        assertThat(GelfAppender.isFQDN("2001:cdba::3257:9652"), equalTo(false));
+        assertThat(GelfAppender.isFQDN("::ffff:0:10.0.0.3"), equalTo(false));
+        assertThat(GelfAppender.isFQDN("host.example.com"), equalTo(true));
     }
 
     @AfterClass
