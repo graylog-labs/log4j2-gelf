@@ -35,12 +35,16 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
     private static final long serialVersionUID = 4796033328540158817L;
+
+    private static Pattern IPV4_PATTERN = Pattern.compile("[:0-9a-f]*(\\d{1,3}\\.){3}(\\d{1,3})");
+    private static Pattern IPV6_PATTERN = Pattern.compile("([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}");
 
     private static final Logger LOG = StatusLogger.getLogger();
 
@@ -247,6 +251,7 @@ public class GelfAppender extends AbstractAppender {
      * @return a new GELF provider
      */
     @PluginFactory
+    @SuppressWarnings("unused")
     public static GelfAppender createGelfAppender(@PluginElement("Filter") Filter filter,
                                                   @PluginElement("Layout") Layout<? extends Serializable> layout,
                                                   @PluginElement(value = "AdditionalFields") final KeyValuePair[] additionalFields,
@@ -280,7 +285,12 @@ public class GelfAppender extends AbstractAppender {
         }
         if (hostName == null || hostName.trim().isEmpty()) {
             try {
-                hostName = InetAddress.getLocalHost().getHostName();
+                final String canonicalHostName = InetAddress.getLocalHost().getCanonicalHostName();
+                if (isFQDN(canonicalHostName)) {
+                    hostName = canonicalHostName;
+                } else {
+                    hostName = InetAddress.getLocalHost().getHostName();
+                }
             } catch (UnknownHostException e) {
                 LOG.warn("Couldn't detect local host name, falling back to \"localhost\"");
                 hostName = "localhost";
@@ -315,5 +325,11 @@ public class GelfAppender extends AbstractAppender {
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
                 includeThreadContext, includeStackTrace, additionalFields, includeExceptionCause);
+    }
+
+    static boolean isFQDN(String canonicalHostName) {
+        return canonicalHostName.contains(".") &&
+                !IPV4_PATTERN.matcher(canonicalHostName).matches() &&
+                !IPV6_PATTERN.matcher(canonicalHostName).matches();
     }
 }
