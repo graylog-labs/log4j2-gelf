@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
 @Plugin(name = "GELF", category = "Core", elementType = "appender", printObject = true)
 public class GelfAppender extends AbstractAppender {
     private static final long serialVersionUID = 4796033328540158817L;
-
+    private static final String REGEX_IP_ADDRESS = "\\d+(\\.\\d+){3}";
     private static final Logger LOG = StatusLogger.getLogger();
 
     private final GelfConfiguration gelfConfiguration;
@@ -280,7 +280,12 @@ public class GelfAppender extends AbstractAppender {
         }
         if (hostName == null || hostName.trim().isEmpty()) {
             try {
-                hostName = InetAddress.getLocalHost().getHostName();
+                final String canonicalHostName = InetAddress.getLocalHost().getCanonicalHostName();
+                if (isFQDN(canonicalHostName)) {
+                    hostName = canonicalHostName;
+                } else {
+                    hostName = InetAddress.getLocalHost().getHostName();
+                }
             } catch (UnknownHostException e) {
                 LOG.warn("Couldn't detect local host name, falling back to \"localhost\"");
                 hostName = "localhost";
@@ -315,5 +320,9 @@ public class GelfAppender extends AbstractAppender {
 
         return new GelfAppender(name, layout, filter, ignoreExceptions, gelfConfiguration, hostName, includeSource,
                 includeThreadContext, includeStackTrace, additionalFields, includeExceptionCause);
+    }
+
+    private static boolean isFQDN(String canonicalHostName) {
+        return canonicalHostName.contains(".") && !canonicalHostName.matches(REGEX_IP_ADDRESS);
     }
 }
