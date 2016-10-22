@@ -76,7 +76,7 @@
         <gpg.keyname>B1606F22</gpg.keyname>
 
         <log4j2.version>2.4.1</log4j2.version>
-        <gelfclient.version>1.4.0</gelfclient.version>
+        <gelfclient.version>1.4.1</gelfclient.version>
     </properties>
 
     <dependencies>
