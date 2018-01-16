@@ -1,17 +1,20 @@
 package org.graylog2.log4j2;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.AppenderLoggingException;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.apache.logging.log4j.core.net.Severity;
 import org.apache.logging.log4j.core.util.KeyValuePair;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -154,7 +157,12 @@ public class GelfAppender extends AbstractAppender {
         }
 
         if (!additionalFields.isEmpty()) {
-            builder.additionalFields(additionalFields);
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            StrSubstitutor substitutor = context.getConfiguration().getStrSubstitutor();
+
+            for(Map.Entry<String, Object> entry : additionalFields.entrySet()) {
+                builder.additionalField(entry.getKey(), substitutor.replace(event, entry.getValue()));
+            }
         }
 
         final GelfMessage gelfMessage = builder.build();
