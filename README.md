@@ -1,3 +1,13 @@
+# Deprecation notice
+
+This project has been deprecated as of 2018-01-16 and will not be maintained anymore.
+
+If you're looking for a GELF appender for Log4j 2, we recommend using [logstash-gelf](https://github.com/mp911de/logstash-gelf/) by [Mark Paluch](https://github.com/mp911de).
+
+![DEPRECATED](deprecated.png)
+
+---
+
 # GELF Appender for Apache Log4j 2
 [![License](https://img.shields.io/github/license/Graylog2/log4j2-gelf.svg?maxAge=2592000)](LICENSE.txt)
 [![Build Status](https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master)](https://travis-ci.org/Graylog2/log4j2-gelf)
