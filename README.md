@@ -9,11 +9,11 @@ If you're looking for a GELF appender for Log4j 2, we recommend using [logstash-
 ---
 
 # GELF Appender for Apache Log4j 2
-[![License](https://img.shields.io/github/license/Graylog2/log4j2-gelf.svg?maxAge=2592000)](LICENSE.txt)
-[![Build Status](https://travis-ci.org/Graylog2/log4j2-gelf.svg?branch=master)](https://travis-ci.org/Graylog2/log4j2-gelf)
+[![License](https://img.shields.io/github/license/graylog-labs/log4j2-gelf.svg?maxAge=2592000)](LICENSE.txt)
+[![Build Status](https://travis-ci.org/graylog-labs/log4j2-gelf.svg?branch=master)](https://travis-ci.org/graylog-labs/log4j2-gelf)
 [![Maven Central](https://img.shields.io/maven-central/v/org.graylog2.log4j2/log4j2-gelf.svg?maxAge=2592000)](http://mvnrepository.com/artifact/org.graylog2.log4j2/log4j2-gelf)
 
-This appender for [Apache Log4j 2](https://logging.apache.org/log4j/2.x/) logs messages to a GELF server like [Graylog2](http://www.graylog2.org) or [logstash](http://logstash.net).
+This appender for [Apache Log4j 2](https://logging.apache.org/log4j/2.x/) logs messages to a GELF server like [Graylog](https://www.graylog.org) or [logstash](http://logstash.net).
 
 It's using the official [GELF Java client](https://graylog2.github.io/gelfclient/) to connect to a remote server.
 
@@ -163,7 +163,7 @@ Maven coordinates
 
 GELF Appender for Apache Log4j 2
 
-Copyright (C) 2014 TORCH GmbH; 2015-2016 Graylog, Inc.
+Copyright (C) 2014 TORCH GmbH; 2015-2018 Graylog, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
